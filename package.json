@@ -1,0 +1,17 @@
+{
+  "name": "pryv-datastore",
+  "version": "1.8.0",
+  "private": true,
+  "description": "Library and tools for accessing external data stores from Pryv.io",
+  "homepage": "https://pryv.com",
+  "license": "BSD-3-Clause",
+  "author": "Pryv S.A. <info@pryv.com> (https://pryv.com)",
+  "main": "src/index.js",
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "eslint": "^8.28.0",
+    "eslint-config-semistandard": "^17.0.0",
+    "mocha": "^10.1.0",
+    "source-licenser": "^2.0.5"
+  }
+}
