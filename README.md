@@ -2,6 +2,7 @@
 
 Library and tools for accessing external data stores within Pryv.io.
 
+API Documentation [DOCUMENTATION.md](DOCUMENTATION.md)
 
 **🚧 WORK IN PROGRESS**
 
