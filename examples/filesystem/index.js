@@ -1,6 +1,7 @@
 const fs = require('fs-extra');
 const ds = require('../../src'); // datastore
 const path = require('path');
+const zlib = require('zlib');
 
 /**
  * Map a filesystem and exposes to Pryv
@@ -22,45 +23,69 @@ module.exports = ds.createDataStore({
     return this;
   },
 
-  iPath (userId, itemId) {
-    itemId = itemId || '';
-    return path.join(this.settings.basePath, userId);
+  /**
+   * get the full path of this itemId
+   * @param {string} userId
+   * @param {string} itemName
+   * @returns {FullPath}
+   */
+  fullPathForSub (userId, itemName) {
+    itemName = itemName || '';
+    return path.join(this.settings.basePath, userId, itemName);
   },
 
   async deleteUser (userId) { // eslint-disable-line no-unused-vars
-    await fs.emptyDir(this.iPath(userId));
+    await fs.emptyDir(this.fullPathForSub(userId));
   },
 
   /**
-   * 
-   * @param {string} userId 
-   * @param {path} directory 
-   * @param {int} depth 
+   * @param {string} userId
+   * @param {path} directory
+   * @param {int} depth
    * @param {Function} inspector - called for each directory params (dir, depth)
    */
   async inspect (userId, directory, depth, inspector) {
 
   },
 
-  idForPath (userId, path) {
+  subPathForFull (userId, fullPath) {
+    return fullPath.substring(this.fullPathForSub(userId).length + 1);
+  },
+
+  /**
+   * Generates a reversible id matching to the file path
+   * @param {*} userId
+   * @param {*} fullPath
+   * @returns
+   */
+  idForFullPath (userId, fullPath) {
     // remove basePath
-    const id = path.substring(this.iPath(userId).length + 1);
-    if (id.length === 0) return null; 
-    return id;
+    const subPath = this.subPathForFull(userId, fullPath);
+    if (subPath.length === 0) return null;
+    return zlib.deflateSync(subPath).toString('base64url');
+  },
+
+  fullPathForId (userId, itemId) {
+    if (itemId == null) return this.fullPathForSub(userId, '');
+    const subPath = zlib.inflateSync(Buffer.from(itemId, 'base64url')).toString();
+    return this.fullPathForSub(userId, subPath);
   },
 
   async getUserStorageSize (userId) { // eslint-disable-line no-unused-vars
     return 0;
   },
 
-  async dirToStream (userId, parentPath, dirPath, dirName) {
-    const stats = await fs.promises.stat(dirPath);
+  async dirToStream (userId, parentFullPath, dirFullPath, dirName) {
+    const stats = await fs.promises.stat(dirFullPath);
     return {
-      id: this.idForPath(userId, dirPath),
-      parentId: this.idForPath(userId, parentPath),
+      id: this.idForFullPath(userId, dirFullPath),
+      parentId: this.idForFullPath(userId, parentFullPath),
       name: dirName,
       created: stats.birthtimeMs / 1000,
-      modified: stats.ctimeMs / 1000
+      modified: stats.ctimeMs / 1000,
+      clientData: {
+        path: this.subPathForFull(userId, dirFullPath)
+      }
     };
   }
 });
@@ -70,9 +95,10 @@ module.exports = ds.createDataStore({
 function createFSUserStreams (fsds) {
   return ds.createUserStreams({
     async get (userId, params) {
-      const rootDir = fsds.iPath(userId, params.id);
+      const parentFullPath = fsds.fullPathForSub(userId, params.id);
       const maxDepth = params.expandChildren || 0;
-      return await loop(rootDir, maxDepth);
+      const excludedIds = params.excludedIds || [];
+      return await loop(parentFullPath, maxDepth);
 
       async function loop (dirPath, depth) {
         const streams = [];
@@ -81,6 +107,11 @@ function createFSUserStreams (fsds) {
           if (dirent.isDirectory()) {
             const subDirPath = path.join(dirPath, dirent.name);
             const stream = await fsds.dirToStream(userId, dirPath, subDirPath, dirent.name);
+
+            // ignore excluded Ids;
+            if (excludedIds.includes(stream.id)) continue;
+
+            // add childrens (or not)
             if (depth !== 0) {
               stream.children = await loop(subDirPath, depth - 1);
             } else {
@@ -95,31 +126,52 @@ function createFSUserStreams (fsds) {
     },
 
     async create (userId, streamData) {
-  
+      console.log('CREATE >>>', userId, streamData);
+      if (streamData.id != null) {
+        throw ds.errors.invalidItemId(`Stream.id is read only : [${streamData.id}]`, streamData);
+      }
+      if (streamData.clientData != null) {
+        throw ds.errors.invalidRequestStructure(`Stream.clientData is read only : [${streamData.id}]`);
+      }
+      const parentFullPath = fsds.fullPathForId(userId, streamData.parentId);
+      const parentSubPath = fsds.subPathForFull(userId, parentFullPath);
+      if (!(await fs.pathExists(parentFullPath))) {
+        throw ds.errors.invalidRequestStructure(`Parent directory with id: [${streamData.parentId}] and path: [${parentSubPath}] does not exists.`);
+      }
+      if (!(await (fs.promises.stat(parentFullPath))).isDirectory()) {
+        throw ds.errors.invalidRequestStructure(`Parent directory with id: [${streamData.parentId}] and path: [${parentSubPath}] is already used by an event.`);
+      }
+      const dirFullPath = path.join(parentFullPath, streamData.name);
+      if ((await fs.pathExists(dirFullPath))) {
+        throw ds.errors.itemAlreadyExists(`Item alredy exists with name: ${streamData.name}`, { name: streamData.name });
+      }
+      console.log('CREATE DIR >>>', dirFullPath);
+      await fs.mkdir(dirFullPath);
+      const stream = fsds.dirToStream(userId, parentFullPath, dirFullPath, streamData.name);
+      stream.children = [];
     },
 
     async update (userId, streamData) {
-      
     },
 
     async updateDelete (userId, streamId) {
-     
+
     },
 
     async deleteAll (userId) {
-     
+
     },
 
     async getDeletions (userId, deletionsSince) {
-      
+
     },
 
     async createDeleted (userId, streamData) {
-      
+
     },
 
     async delete (userId, streamId) {
-      
+
     }
   });
 }
@@ -127,19 +179,18 @@ function createFSUserStreams (fsds) {
 function createFSUserEvents (rs) {
   return ds.createUserEvents({
     async get (userId, params) {
-     
+
     },
 
     async getStreamed (userId, params) {
-     
+
     },
 
     async getOne (userId, eventId) {
-     
     },
 
     async create (userId, eventData) {
-      
+
     },
 
     // async saveAttachedFiles (userId, partialEventData, attachmentsItems) { throw errors.unsupportedOperation('events.saveAttachedFiles'); },
@@ -147,12 +198,10 @@ function createFSUserEvents (rs) {
     // async deleteAttachedFile (userId, eventData, fileId) { throw errors.unsupportedOperation('events.deleteAttachedFile'); },
 
     async update (userId, eventData) {
-    
+
     },
     async delete (userId, eventId, params) {
-    
+
     }
   });
 }
-
-

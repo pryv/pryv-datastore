@@ -71,6 +71,7 @@ module.exports = {
    * @returns {PryvDataStoreError}
    */
   invalidItemId (message, data, innerError) {
+    console.log({message, data, innerError});
     return new PryvDataStoreError(ErrorIds.InvalidItemId, message, data, innerError);
   },
 
