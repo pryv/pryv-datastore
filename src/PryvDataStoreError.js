@@ -5,6 +5,7 @@
  * under the terms of the 3-Clause BSD License
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
 module.exports = PryvDataStoreError;
 
 /**

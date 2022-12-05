@@ -46,13 +46,13 @@ const DataStore = module.exports = {
 
   /**
    * The {@link UserStreams} implementation.
-   * @type {UserStreams}
+   * @type {import('./UserStreams')}
    */
   streams: null,
 
   /**
    * The {@link UserEvents} implementation.
-   * @type {UserEvents}
+   * @type {import('./UserEvents')}
    */
   events: null,
 
@@ -70,7 +70,7 @@ const DataStore = module.exports = {
    * Get store-specific key-value data for the given user.
    * This should never return secrets such as passwords, tokens etc. which should be write-only via {@link #setUserData}.
    * @param {identifier} userId
-   * @returns {object}
+   * @returns {Promise<object>}
    */
   async getUserData (userId) { throw new Error('Not implemented'); }, // eslint-disable-line no-unused-vars
 
@@ -83,7 +83,7 @@ const DataStore = module.exports = {
   /**
    * Return the total amount of storage used by the given user, in bytes.
    * @param {identifier} userId
-   * @returns {number}
+   * @returns {Promise<number>}
    */
   async getUserStorageSize (userId) { throw new Error('Not implemented'); } // eslint-disable-line no-unused-vars
 };

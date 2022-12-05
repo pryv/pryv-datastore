@@ -19,26 +19,31 @@ clean:
     rm -rf components/**/node_modules
 
 # –––––––––––––----------------------------------------------------------------
-# Documentation
-# –––––––––––––----------------------------------------------------------------
-
-# Generate DOCUMENTATION.md file form `src/` jsdoc comments
-doc:
-    node node_modules/jsdoc-to-markdown/bin/cli.js -f src/**/*.js > DOCUMENTATION.md
-
-# –––––––––––––----------------------------------------------------------------
-# Run
-# –––––––––––––----------------------------------------------------------------
-
-# –––––––––––––----------------------------------------------------------------
 # Test & related
 # –––––––––––––----------------------------------------------------------------
 
-# Run code linting on the entire repo
+# Run code linting
 lint *options:
     eslint {{options}} .
+
+# Run types checking
+types-check *options:
+    tsc {{options}}
+
+# Generate TypeScript definitions
+types-emit *options:
+    rm src/*.d.ts
+    tsc src/*.js --checkJs --declaration --emitDeclarationOnly {{options}}
 
 # Run source licensing tool (see 'licensing' folder for details)
 license:
     source-licenser --config-file .licenser.yml ./
 
+# –––––––––––––----------------------------------------------------------------
+# Documentation
+# –––––––––––––----------------------------------------------------------------
+
+# Generate DOCUMENTATION.md file from JSDoc comments in `src`
+doc:
+    typedoc
+    # node node_modules/jsdoc-to-markdown/bin/cli.js -f src/**/*.js > DOCUMENTATION.md

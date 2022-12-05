@@ -9,6 +9,26 @@
 const errors = require('./errors');
 
 /**
+ * @typedef {string} identifier
+ */
+
+/**
+ * @typedef {number} timestamp
+ */
+
+/**
+ * @typedef {string} integrity
+ */
+
+/**
+ * @typedef {object} Event
+ */
+
+/**
+ * @typedef {object} EventDeletionItem
+ */
+
+/**
  * Object to pass when creating events with attachments or adding attachments to events
  * @typedef {object} AttachmentItem
  * @property {string} filename fileName
@@ -39,7 +59,7 @@ const UserEvents = module.exports = {
    * @param {boolean} [params.withDeletions=false] - Include event deletions in the results.
    * @param {timestamp} [params.deletedSince=null] -  Only return deleted events, sorted by deletion date descending.
    * @param {boolean} [params.includeHistory=false] - Include change history for events.
-   * @returns {Event[]}
+   * @returns {Promise<Event[]>}
    */
   async get (userId, params) { throw errors.unsupportedOperation('events.get'); },
 
@@ -48,7 +68,7 @@ const UserEvents = module.exports = {
    * @see [Get events in Pryv.io API reference](https://api.pryv.com/reference/#get-events)
    * @param {identifier} userId
    * @param {object} params - event query
-   * @returns {ReadableStream}
+   * @returns {Promise<ReadableStream>}
    */
   async getStreamed (userId, params) { throw errors.unsupportedOperation('events.getStreamed'); },
 
@@ -62,31 +82,31 @@ const UserEvents = module.exports = {
   /**
    * @see [Create events in Pryv.io API reference](https://api.pryv.com/reference/#create-event)
    * @param {identifier} userId
-   * @param {EventData} eventData
+   * @param {object} eventData
    * @throws {PryvDataStoreError} with id `item-already-exists`
    * @throws {PryvDataStoreError} with id `invalid-item-id`
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
-   * @returns {Event} - The created event
+   * @returns {Promise<Event>} - The created event
    */
   async create (userId, eventData) { throw errors.unsupportedOperation('events.create'); },
 
   /**
    * @param {identifier} userId
-   * @param {any} partialEventData - eventData (without the new attachments and integrity property)
+   * @param {object} partialEventData - eventData (without the new attachments and integrity property)
    * @param {AttachmentItem[]} attachmentsItems - Array of attachments informations.
    * @throws {PryvDataStoreError} with id `item-already-exists`
    * @throws {PryvDataStoreError} with id `invalid-item-id`
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
-   * @returns {AttachmentResponseItem} - The ids and other information related to the attachments
+   * @returns {Promise<AttachmentResponseItem>} - The ids and other information related to the attachments
    */
   async saveAttachedFiles (userId, partialEventData, attachmentsItems) { throw errors.unsupportedOperation('events.saveAttachedFiles'); },
 
   /**
    * Retrieve the specified file as a stream.
    * @param {identifier} userId
-   * @param {*} eventData
+   * @param {object} eventData
    * @param {identifier} fileId
-   * @returns {stream.Readable}
+   * @returns {Promise<ReadableStream>}
    */
   async getAttachedFile (userId, eventData, fileId) { throw errors.unsupportedOperation('events.getAttachedFile'); },
 
@@ -97,7 +117,7 @@ const UserEvents = module.exports = {
    * @param {identifier} fileId
    * @throws {PryvDataStoreError} with id `invalid-item-id`
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
-   * @returns {AttachmentResponseItem} - The ids and other information related to the attachments
+   * @returns {Promise<AttachmentResponseItem>} - The ids and other information related to the attachments
    */
   async deleteAttachedFile (userId, eventData, fileId) { throw errors.unsupportedOperation('events.deleteAttachedFile'); },
 
@@ -106,7 +126,7 @@ const UserEvents = module.exports = {
    * @param {identifier} userId
    * @param {any} eventData - New event data
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
-   * @returns {boolean} - true if an event was updated
+   * @returns {Promise<boolean>} - true if an event was updated
    */
   async update (userId, eventData) { throw errors.unsupportedOperation('events.replace'); },
 
@@ -117,7 +137,7 @@ const UserEvents = module.exports = {
    * @param {object} params
    * @throws {PryvDataStoreError} with id `item-already-exists`
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
-   * @returns {Event|EventDeletionItem} - The trashed Event
+   * @returns {Promise<Event|EventDeletionItem>} - The trashed Event
    */
   async delete (userId, eventId, params) { throw errors.unsupportedOperation('events.delete'); }
 };
