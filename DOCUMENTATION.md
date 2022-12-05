@@ -56,7 +56,19 @@ All data store implementations inherit from this via <a href="datastore#createDa
 <dt><a href="#timestamp">timestamp</a> : <code>number</code></dt>
 <dd><p>A positive floating-point number representing the number of seconds since a reference time (Unix epoch time).</p>
 </dd>
-<dt><a href="#PryvDataStoreError">PryvDataStoreError</a></dt>
+<dt><a href="#UserStreams">UserStreams</a> : <code>undefined</code></dt>
+<dd></dd>
+<dt><a href="#UserEvents">UserEvents</a> : <code>undefined</code></dt>
+<dd></dd>
+<dt><a href="#identifier">identifier</a> : <code>string</code></dt>
+<dd></dd>
+<dt><a href="#timestamp">timestamp</a> : <code>number</code></dt>
+<dd></dd>
+<dt><a href="#integrity">integrity</a> : <code>string</code></dt>
+<dd></dd>
+<dt><a href="#Event">Event</a> : <code>object</code></dt>
+<dd></dd>
+<dt><a href="#EventDeletionItem">EventDeletionItem</a> : <code>object</code></dt>
 <dd></dd>
 <dt><a href="#AttachmentItem">AttachmentItem</a> : <code>object</code></dt>
 <dd><p>Object to pass when creating events with attachments or adding attachments to events</p>
@@ -64,6 +76,14 @@ All data store implementations inherit from this via <a href="datastore#createDa
 <dt><a href="#AttachmentResponseItem">AttachmentResponseItem</a> : <code>object</code></dt>
 <dd><p>Informations sent by the store after saving attachment</p>
 </dd>
+<dt><a href="#identifier">identifier</a> : <code>string</code></dt>
+<dd></dd>
+<dt><a href="#timestamp">timestamp</a> : <code>number</code></dt>
+<dd></dd>
+<dt><a href="#Stream">Stream</a> : <code>object</code></dt>
+<dd></dd>
+<dt><a href="#StreamDeletionItem">StreamDeletionItem</a> : <code>object</code></dt>
+<dd></dd>
 </dl>
 
 <a name="module_DataStore"></a>
@@ -77,13 +97,13 @@ All data store implementations inherit from this via [datastore#createDataStore]
     * [.id](#module_DataStore.id) : <code>string</code>
     * [.name](#module_DataStore.name) : <code>string</code>
     * [.settings](#module_DataStore.settings) : <code>object</code>
-    * [.streams](#module_DataStore.streams) : <code>UserStreams</code>
-    * [.events](#module_DataStore.events) : <code>UserEvents</code>
+    * [.streams](#module_DataStore.streams) : [<code>UserStreams</code>](#UserStreams)
+    * [.events](#module_DataStore.events) : [<code>UserEvents</code>](#UserEvents)
     * [.init()](#module_DataStore.init) ⇒ [<code>DataStore</code>](#DataStore)
     * [.setUserData(userId, data)](#module_DataStore.setUserData)
-    * [.getUserData(userId)](#module_DataStore.getUserData) ⇒ <code>object</code>
+    * [.getUserData(userId)](#module_DataStore.getUserData) ⇒ <code>Promise.&lt;object&gt;</code>
     * [.deleteUser(userId)](#module_DataStore.deleteUser)
-    * [.getUserStorageSize(userId)](#module_DataStore.getUserStorageSize) ⇒ <code>number</code>
+    * [.getUserStorageSize(userId)](#module_DataStore.getUserStorageSize) ⇒ <code>Promise.&lt;number&gt;</code>
 
 <a name="module_DataStore.id"></a>
 
@@ -105,14 +125,14 @@ The data store's configuration settings (loaded from platform settings at creati
 **Kind**: static property of [<code>DataStore</code>](#module_DataStore)  
 <a name="module_DataStore.streams"></a>
 
-### DataStore.streams : <code>UserStreams</code>
-The [UserStreams](UserStreams) implementation.
+### DataStore.streams : [<code>UserStreams</code>](#UserStreams)
+The [UserStreams](#UserStreams) implementation.
 
 **Kind**: static property of [<code>DataStore</code>](#module_DataStore)  
 <a name="module_DataStore.events"></a>
 
-### DataStore.events : <code>UserEvents</code>
-The [UserEvents](UserEvents) implementation.
+### DataStore.events : [<code>UserEvents</code>](#UserEvents)
+The [UserEvents](#UserEvents) implementation.
 
 **Kind**: static property of [<code>DataStore</code>](#module_DataStore)  
 <a name="module_DataStore.init"></a>
@@ -138,7 +158,7 @@ This is called for both creating and updating the data.
 
 <a name="module_DataStore.getUserData"></a>
 
-### DataStore.getUserData(userId) ⇒ <code>object</code>
+### DataStore.getUserData(userId) ⇒ <code>Promise.&lt;object&gt;</code>
 TODO: implement
 Get store-specific key-value data for the given user.
 This should never return secrets such as passwords, tokens etc. which should be write-only via [#setUserData](#setUserData).
@@ -162,7 +182,7 @@ Called when the given user is deleted from Pryv.io, to let the store delete the 
 
 <a name="module_DataStore.getUserStorageSize"></a>
 
-### DataStore.getUserStorageSize(userId) ⇒ <code>number</code>
+### DataStore.getUserStorageSize(userId) ⇒ <code>Promise.&lt;number&gt;</code>
 Return the total amount of storage used by the given user, in bytes.
 
 **Kind**: static method of [<code>DataStore</code>](#module_DataStore)  
@@ -275,7 +295,7 @@ Helper "factory" methods for data store errors (see error ids).
     * [.unknownResource(resourceType, id, innerError)](#module_errors.unknownResource) ⇒ [<code>PryvDataStoreError</code>](#PryvDataStoreError)
     * [.itemAlreadyExists(resourceType, conflictingKeys, innerError)](#module_errors.itemAlreadyExists) ⇒ [<code>PryvDataStoreError</code>](#PryvDataStoreError)
     * [.invalidItemId(message, data, innerError)](#module_errors.invalidItemId) ⇒ [<code>PryvDataStoreError</code>](#PryvDataStoreError)
-    * [.unsupportedOperation(message, data, innerError)](#module_errors.unsupportedOperation) ⇒ [<code>PryvDataStoreError</code>](#PryvDataStoreError)
+    * [.unsupportedOperation(message, [data], [innerError])](#module_errors.unsupportedOperation) ⇒ [<code>PryvDataStoreError</code>](#PryvDataStoreError)
 
 <a name="module_errors.unexpectedError"></a>
 
@@ -334,14 +354,14 @@ Helper "factory" methods for data store errors (see error ids).
 
 <a name="module_errors.unsupportedOperation"></a>
 
-### errors.unsupportedOperation(message, data, innerError) ⇒ [<code>PryvDataStoreError</code>](#PryvDataStoreError)
+### errors.unsupportedOperation(message, [data], [innerError]) ⇒ [<code>PryvDataStoreError</code>](#PryvDataStoreError)
 **Kind**: static method of [<code>errors</code>](#module_errors)  
 
 | Param | Type |
 | --- | --- |
 | message | <code>string</code> | 
-| data | <code>\*</code> | 
-| innerError | <code>Error</code> | 
+| [data] | <code>\*</code> | 
+| [innerError] | <code>Error</code> | 
 
 <a name="module_datastore"></a>
 
@@ -349,8 +369,8 @@ Helper "factory" methods for data store errors (see error ids).
 
 * [datastore](#module_datastore)
     * [.createDataStore(implementation)](#module_datastore.createDataStore) ⇒ [<code>DataStore</code>](#DataStore)
-    * [.createUserStreams(implementation)](#module_datastore.createUserStreams) ⇒ <code>UserStreams</code>
-    * [.createUserEvents(implementation)](#module_datastore.createUserEvents) ⇒ <code>UserEvents</code>
+    * [.createUserStreams(implementation)](#module_datastore.createUserStreams) ⇒ [<code>UserStreams</code>](#UserStreams)
+    * [.createUserEvents(implementation)](#module_datastore.createUserEvents) ⇒ [<code>UserEvents</code>](#UserEvents)
 
 <a name="module_datastore.createDataStore"></a>
 
@@ -365,25 +385,25 @@ Create a new data store object with the given implementation.
 
 <a name="module_datastore.createUserStreams"></a>
 
-### datastore.createUserStreams(implementation) ⇒ <code>UserStreams</code>
+### datastore.createUserStreams(implementation) ⇒ [<code>UserStreams</code>](#UserStreams)
 Create a new user streams object with the given implementation.
 
 **Kind**: static method of [<code>datastore</code>](#module_datastore)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| implementation | <code>Object</code> | An object implementing [UserStreams](UserStreams) methods |
+| implementation | <code>Object</code> | An object implementing [UserStreams](#UserStreams) methods |
 
 <a name="module_datastore.createUserEvents"></a>
 
-### datastore.createUserEvents(implementation) ⇒ <code>UserEvents</code>
+### datastore.createUserEvents(implementation) ⇒ [<code>UserEvents</code>](#UserEvents)
 Create a new user events object with the given implementation.
 
 **Kind**: static method of [<code>datastore</code>](#module_datastore)  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| implementation | <code>Object</code> | An object implementing [UserEvents](UserEvents) methods |
+| implementation | <code>Object</code> | An object implementing [UserEvents](#UserEvents) methods |
 
 <a name="module_UserEvents"></a>
 
@@ -393,19 +413,19 @@ Prototype object for per-user events data.
 
 
 * [UserEvents](#module_UserEvents)
-    * [.get(userId, params)](#module_UserEvents.get) ⇒ <code>Array.&lt;Event&gt;</code>
-    * [.getStreamed(userId, params)](#module_UserEvents.getStreamed) ⇒ <code>ReadableStream</code>
+    * [.get(userId, params)](#module_UserEvents.get) ⇒ <code>Promise.&lt;Array.&lt;Event&gt;&gt;</code>
+    * [.getStreamed(userId, params)](#module_UserEvents.getStreamed) ⇒ <code>Promise.&lt;ReadableStream&gt;</code>
     * [.getOne(userId, eventId)](#module_UserEvents.getOne)
-    * [.create(userId, eventData)](#module_UserEvents.create) ⇒ <code>Event</code>
-    * [.saveAttachedFiles(userId, partialEventData, attachmentsItems)](#module_UserEvents.saveAttachedFiles) ⇒ [<code>AttachmentResponseItem</code>](#AttachmentResponseItem)
-    * [.getAttachedFile(userId, eventData, fileId)](#module_UserEvents.getAttachedFile) ⇒ <code>stream.Readable</code>
-    * [.deleteAttachedFile(userId, eventData, fileId)](#module_UserEvents.deleteAttachedFile) ⇒ [<code>AttachmentResponseItem</code>](#AttachmentResponseItem)
-    * [.update(userId, eventData)](#module_UserEvents.update) ⇒ <code>boolean</code>
-    * [.delete(userId, eventId, params)](#module_UserEvents.delete) ⇒ <code>Event</code> \| <code>EventDeletionItem</code>
+    * [.create(userId, eventData)](#module_UserEvents.create) ⇒ [<code>Promise.&lt;Event&gt;</code>](#Event)
+    * [.saveAttachedFiles(userId, partialEventData, attachmentsItems)](#module_UserEvents.saveAttachedFiles) ⇒ [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem)
+    * [.getAttachedFile(userId, eventData, fileId)](#module_UserEvents.getAttachedFile) ⇒ <code>Promise.&lt;ReadableStream&gt;</code>
+    * [.deleteAttachedFile(userId, eventData, fileId)](#module_UserEvents.deleteAttachedFile) ⇒ [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem)
+    * [.update(userId, eventData)](#module_UserEvents.update) ⇒ <code>Promise.&lt;boolean&gt;</code>
+    * [.delete(userId, eventId, params)](#module_UserEvents.delete) ⇒ <code>Promise.&lt;(Event\|EventDeletionItem)&gt;</code>
 
 <a name="module_UserEvents.get"></a>
 
-### UserEvents.get(userId, params) ⇒ <code>Array.&lt;Event&gt;</code>
+### UserEvents.get(userId, params) ⇒ <code>Promise.&lt;Array.&lt;Event&gt;&gt;</code>
 Get events for this user.
 
 **Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  
@@ -421,7 +441,7 @@ Get events for this user.
 
 <a name="module_UserEvents.getStreamed"></a>
 
-### UserEvents.getStreamed(userId, params) ⇒ <code>ReadableStream</code>
+### UserEvents.getStreamed(userId, params) ⇒ <code>Promise.&lt;ReadableStream&gt;</code>
 Get events as a stream for this user.
 
 **Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  
@@ -446,9 +466,9 @@ TODO: implement
 
 <a name="module_UserEvents.create"></a>
 
-### UserEvents.create(userId, eventData) ⇒ <code>Event</code>
+### UserEvents.create(userId, eventData) ⇒ [<code>Promise.&lt;Event&gt;</code>](#Event)
 **Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  
-**Returns**: <code>Event</code> - - The created event  
+**Returns**: [<code>Promise.&lt;Event&gt;</code>](#Event) - - The created event  
 **Throws**:
 
 - [<code>PryvDataStoreError</code>](#PryvDataStoreError) with id `item-already-exists`
@@ -460,13 +480,13 @@ TODO: implement
 | Param | Type |
 | --- | --- |
 | userId | [<code>identifier</code>](#identifier) | 
-| eventData | <code>EventData</code> | 
+| eventData | <code>object</code> | 
 
 <a name="module_UserEvents.saveAttachedFiles"></a>
 
-### UserEvents.saveAttachedFiles(userId, partialEventData, attachmentsItems) ⇒ [<code>AttachmentResponseItem</code>](#AttachmentResponseItem)
+### UserEvents.saveAttachedFiles(userId, partialEventData, attachmentsItems) ⇒ [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem)
 **Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  
-**Returns**: [<code>AttachmentResponseItem</code>](#AttachmentResponseItem) - - The ids and other information related to the attachments  
+**Returns**: [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem) - - The ids and other information related to the attachments  
 **Throws**:
 
 - [<code>PryvDataStoreError</code>](#PryvDataStoreError) with id `item-already-exists`
@@ -477,12 +497,12 @@ TODO: implement
 | Param | Type | Description |
 | --- | --- | --- |
 | userId | [<code>identifier</code>](#identifier) |  |
-| partialEventData | <code>any</code> | eventData (without the new attachments and integrity property) |
+| partialEventData | <code>object</code> | eventData (without the new attachments and integrity property) |
 | attachmentsItems | [<code>Array.&lt;AttachmentItem&gt;</code>](#AttachmentItem) | Array of attachments informations. |
 
 <a name="module_UserEvents.getAttachedFile"></a>
 
-### UserEvents.getAttachedFile(userId, eventData, fileId) ⇒ <code>stream.Readable</code>
+### UserEvents.getAttachedFile(userId, eventData, fileId) ⇒ <code>Promise.&lt;ReadableStream&gt;</code>
 Retrieve the specified file as a stream.
 
 **Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  
@@ -490,16 +510,16 @@ Retrieve the specified file as a stream.
 | Param | Type |
 | --- | --- |
 | userId | [<code>identifier</code>](#identifier) | 
-| eventData | <code>\*</code> | 
+| eventData | <code>object</code> | 
 | fileId | [<code>identifier</code>](#identifier) | 
 
 <a name="module_UserEvents.deleteAttachedFile"></a>
 
-### UserEvents.deleteAttachedFile(userId, eventData, fileId) ⇒ [<code>AttachmentResponseItem</code>](#AttachmentResponseItem)
+### UserEvents.deleteAttachedFile(userId, eventData, fileId) ⇒ [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem)
 Delete the specified file.
 
 **Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  
-**Returns**: [<code>AttachmentResponseItem</code>](#AttachmentResponseItem) - - The ids and other information related to the attachments  
+**Returns**: [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem) - - The ids and other information related to the attachments  
 **Throws**:
 
 - [<code>PryvDataStoreError</code>](#PryvDataStoreError) with id `invalid-item-id`
@@ -514,11 +534,11 @@ Delete the specified file.
 
 <a name="module_UserEvents.update"></a>
 
-### UserEvents.update(userId, eventData) ⇒ <code>boolean</code>
+### UserEvents.update(userId, eventData) ⇒ <code>Promise.&lt;boolean&gt;</code>
 Fully replace an event with new Data
 
 **Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  
-**Returns**: <code>boolean</code> - - true if an event was updated  
+**Returns**: <code>Promise.&lt;boolean&gt;</code> - - true if an event was updated  
 **Throws**:
 
 - [<code>PryvDataStoreError</code>](#PryvDataStoreError) with id `resource-is-readonly` if either storage or parent stream is read-only
@@ -531,9 +551,9 @@ Fully replace an event with new Data
 
 <a name="module_UserEvents.delete"></a>
 
-### UserEvents.delete(userId, eventId, params) ⇒ <code>Event</code> \| <code>EventDeletionItem</code>
+### UserEvents.delete(userId, eventId, params) ⇒ <code>Promise.&lt;(Event\|EventDeletionItem)&gt;</code>
 **Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  
-**Returns**: <code>Event</code> \| <code>EventDeletionItem</code> - - The trashed Event  
+**Returns**: <code>Promise.&lt;(Event\|EventDeletionItem)&gt;</code> - - The trashed Event  
 **Throws**:
 
 - [<code>PryvDataStoreError</code>](#PryvDataStoreError) with id `item-already-exists`
@@ -555,19 +575,19 @@ Prototype object for per-user streams data.
 
 
 * [UserStreams](#module_UserStreams)
-    * [.get(userId, params)](#module_UserStreams.get) ⇒ <code>Stream</code> \| <code>null</code>
-    * [.getDeletions(userId, deletionSince)](#module_UserStreams.getDeletions)
-    * [.create(userId)](#module_UserStreams.create) ⇒ <code>Stream</code>
-    * [.update(userId)](#module_UserStreams.update) ⇒ <code>Stream</code>
-    * [.delete(userId, streamId, params)](#module_UserStreams.delete) ⇒ <code>Stream</code> \| <code>StreamDeletionItem</code>
+    * [.get(userId, params)](#module_UserStreams.get) ⇒ <code>Promise.&lt;(Stream\|null)&gt;</code>
+    * [.getDeletions(userId, deletionsSince)](#module_UserStreams.getDeletions)
+    * [.create(userId)](#module_UserStreams.create) ⇒ [<code>Promise.&lt;Stream&gt;</code>](#Stream)
+    * [.update(userId)](#module_UserStreams.update) ⇒ [<code>Promise.&lt;Stream&gt;</code>](#Stream)
+    * [.delete(userId, streamId, params)](#module_UserStreams.delete) ⇒ <code>Promise.&lt;(Stream\|StreamDeletionItem)&gt;</code>
 
 <a name="module_UserStreams.get"></a>
 
-### UserStreams.get(userId, params) ⇒ <code>Stream</code> \| <code>null</code>
+### UserStreams.get(userId, params) ⇒ <code>Promise.&lt;(Stream\|null)&gt;</code>
 Get the stream that will be set as root for all Stream Structure of this Data Store.
 
 **Kind**: static method of [<code>UserStreams</code>](#module_UserStreams)  
-**Returns**: <code>Stream</code> \| <code>null</code> - - the stream or null if not found:  
+**Returns**: <code>Promise.&lt;(Stream\|null)&gt;</code> - - the stream or null if not found:  
 **See**: https://api.pryv.com/reference/#get-streams  
 
 | Param | Type | Default | Description |
@@ -575,13 +595,13 @@ Get the stream that will be set as root for all Stream Structure of this Data St
 | userId | [<code>identifier</code>](#identifier) |  |  |
 | params | <code>object</code> |  |  |
 | [params.id] | [<code>identifier</code>](#identifier) |  | null, means root streamId. Notice parentId is not implemented by stores |
-| [params.expandChildren] | <code>number</code> | <code>false</code> | ← TODO check if correct |
+| [params.expandChildren] | <code>number</code> | <code>false</code> | <-- TODO check if correct |
 | [params.excludeIds] | [<code>Array.&lt;identifier&gt;</code>](#identifier) |  | list of streamIds to exclude from query. if expandChildren is >0 or < 0, children of excludedIds should be excludded too |
 | [params.includeTrashed] | <code>boolean</code> |  | (equivalent to state = 'all') |
 
 <a name="module_UserStreams.getDeletions"></a>
 
-### UserStreams.getDeletions(userId, deletionSince)
+### UserStreams.getDeletions(userId, deletionsSince)
 Get a list of deleted ids since
 
 **Kind**: static method of [<code>UserStreams</code>](#module_UserStreams)  
@@ -589,13 +609,13 @@ Get a list of deleted ids since
 | Param | Type |
 | --- | --- |
 | userId | [<code>identifier</code>](#identifier) | 
-| deletionSince | [<code>timestamp</code>](#timestamp) | 
+| deletionsSince | [<code>timestamp</code>](#timestamp) | 
 
 <a name="module_UserStreams.create"></a>
 
-### UserStreams.create(userId) ⇒ <code>Stream</code>
+### UserStreams.create(userId) ⇒ [<code>Promise.&lt;Stream&gt;</code>](#Stream)
 **Kind**: static method of [<code>UserStreams</code>](#module_UserStreams)  
-**Returns**: <code>Stream</code> - - The created Stream  
+**Returns**: [<code>Promise.&lt;Stream&gt;</code>](#Stream) - - The created Stream  
 **Throws**:
 
 - item-already-exists
@@ -610,9 +630,9 @@ Get a list of deleted ids since
 
 <a name="module_UserStreams.update"></a>
 
-### UserStreams.update(userId) ⇒ <code>Stream</code>
+### UserStreams.update(userId) ⇒ [<code>Promise.&lt;Stream&gt;</code>](#Stream)
 **Kind**: static method of [<code>UserStreams</code>](#module_UserStreams)  
-**Returns**: <code>Stream</code> - - The update Stream  
+**Returns**: [<code>Promise.&lt;Stream&gt;</code>](#Stream) - - The update Stream  
 **Throws**:
 
 - item-already-exists
@@ -626,9 +646,9 @@ Get a list of deleted ids since
 
 <a name="module_UserStreams.delete"></a>
 
-### UserStreams.delete(userId, streamId, params) ⇒ <code>Stream</code> \| <code>StreamDeletionItem</code>
+### UserStreams.delete(userId, streamId, params) ⇒ <code>Promise.&lt;(Stream\|StreamDeletionItem)&gt;</code>
 **Kind**: static method of [<code>UserStreams</code>](#module_UserStreams)  
-**Returns**: <code>Stream</code> \| <code>StreamDeletionItem</code> - - The trashed Stream  
+**Returns**: <code>Promise.&lt;(Stream\|StreamDeletionItem)&gt;</code> - - The trashed Stream  
 **Throws**:
 
 - item-already-exists
@@ -706,19 +726,34 @@ A string uniquely identifying an object (user, event, stream, etc.)
 A positive floating-point number representing the number of seconds since a reference time (Unix epoch time).
 
 **Kind**: global typedef  
-<a name="PryvDataStoreError"></a>
+<a name="UserStreams"></a>
 
-## PryvDataStoreError
+## UserStreams : <code>undefined</code>
 **Kind**: global typedef  
-**Properties**
+<a name="UserEvents"></a>
 
-| Type |
-| --- |
-| <code>id</code> | 
-| <code>message</code> | 
-| <code>data</code> | 
-| <code>innerError</code> | 
+## UserEvents : <code>undefined</code>
+**Kind**: global typedef  
+<a name="identifier"></a>
 
+## identifier : <code>string</code>
+**Kind**: global typedef  
+<a name="timestamp"></a>
+
+## timestamp : <code>number</code>
+**Kind**: global typedef  
+<a name="integrity"></a>
+
+## integrity : <code>string</code>
+**Kind**: global typedef  
+<a name="Event"></a>
+
+## Event : <code>object</code>
+**Kind**: global typedef  
+<a name="EventDeletionItem"></a>
+
+## EventDeletionItem : <code>object</code>
+**Kind**: global typedef  
 <a name="AttachmentItem"></a>
 
 ## AttachmentItem : <code>object</code>
@@ -732,7 +767,7 @@ Object to pass when creating events with attachments or adding attachments to ev
 | filename | <code>string</code> | fileName |
 | [size] | <code>number</code> | The size of the attachment |
 | attachmentData | <code>ReadableStream</code> |  |
-| [integrity] | <code>integrity</code> | The integrity checksum of the attachment |
+| [integrity] | [<code>integrity</code>](#integrity) | The integrity checksum of the attachment |
 
 <a name="AttachmentResponseItem"></a>
 
@@ -745,3 +780,19 @@ Informations sent by the store after saving attachment
 | --- | --- | --- |
 | id | <code>string</code> | mandatory id of the attachement - unique - per event |
 
+<a name="identifier"></a>
+
+## identifier : <code>string</code>
+**Kind**: global typedef  
+<a name="timestamp"></a>
+
+## timestamp : <code>number</code>
+**Kind**: global typedef  
+<a name="Stream"></a>
+
+## Stream : <code>object</code>
+**Kind**: global typedef  
+<a name="StreamDeletionItem"></a>
+
+## StreamDeletionItem : <code>object</code>
+**Kind**: global typedef  

@@ -14,6 +14,9 @@
  * @typedef {number} timestamp - A positive floating-point number representing the number of seconds since a reference time (Unix epoch time).
  */
 
+/** @typedef {import('./UserStreams')} UserStreams */
+/** @typedef {import('./UserEvents')} UserEvents */
+
 /**
  * Data store prototype object.
  * All data store implementations inherit from this via {@link datastore#createDataStore}.
@@ -46,13 +49,13 @@ const DataStore = module.exports = {
 
   /**
    * The {@link UserStreams} implementation.
-   * @type {import('./UserStreams')}
+   * @type {UserStreams}
    */
   streams: null,
 
   /**
    * The {@link UserEvents} implementation.
-   * @type {import('./UserEvents')}
+   * @type {UserEvents}
    */
   events: null,
 

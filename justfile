@@ -45,5 +45,4 @@ license:
 
 # Generate DOCUMENTATION.md file from JSDoc comments in `src`
 doc:
-    typedoc
-    # node node_modules/jsdoc-to-markdown/bin/cli.js -f src/**/*.js > DOCUMENTATION.md
+    jsdoc2md -c jsdoc.conf.json -f src/**/*.js > DOCUMENTATION.md
