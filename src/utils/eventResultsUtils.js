@@ -1,7 +1,8 @@
 
 module.exports = {
   insertEventInOrderedArray,
-  eventMatchesParamFilter
+  eventMatchesParamFilter,
+  stripArrayResultFromParams
 };
 
 /**
@@ -32,4 +33,16 @@ function insertEventInOrderedArray (arrayOfEvents, event, sortAscending = true) 
     else high = mid;
   }
   arrayOfEvents.splice(low, 0, event);
+}
+
+/**
+ * Strip an result array considering params (skip, limit, fromTime and toTime)
+ */
+function stripArrayResultFromParams (events, params) {
+  const skip = params.skip || 0;
+  // limit by default is 20 if no fromTime toTime is defined
+  const defaultLimit = (params.fromTime == null && params.toTime == null) ? 20 : events.length;
+  const to = (params.limit || defaultLimit) + skip;
+
+  return events.slice(skip, to);
 }

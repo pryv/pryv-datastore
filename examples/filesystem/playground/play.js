@@ -5,7 +5,7 @@
  * under the terms of the 3-Clause BSD License
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const fsds = require('../index.js');
+const fsds = require('../');
 const path = require('path');
 
 fsds.id = 'fsds';
