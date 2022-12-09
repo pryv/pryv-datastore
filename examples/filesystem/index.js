@@ -12,6 +12,7 @@ const zlib = require('zlib');
 const mrmime = require('mrmime');
 
 const streamsInspectorForStreamQuery = require('../../src/utils/streamsInspectorForStreamQuery');
+const { insertEventInOrderedArray, eventMatchesParamFilter } = require('../../src/utils/eventResultsUtils');
 
 /**
  * Map a filesystem and exposes to Pryv
@@ -108,6 +109,7 @@ module.exports = ds.createDataStore({
       streamIds: [streamId],
       created: stats.birthtimeMs / 1000,
       modified: stats.ctimeMs / 1000,
+      time: stats.ctimeMs / 1000,
       type: 'file/attached',
       content: null,
       attachments: [{
@@ -253,27 +255,27 @@ function createFSUserEvents (fsds) {
           } else {
             if (collectEvents) {
               const event = await fsds.fileToEvent(userId, dirSubPath, dirent.name, streamId);
-              // filter event HERE
               addEvent(event);
             }
           }
         }
       }
+      const skip = params.skip || 0;
+      // limit by default is 20 if no fromTime toTime is defined
+      const defaultLimit = (params.fromTime == null && params.toTime == null) ? 20 : events.length;
+      const to = (params.limit || defaultLimit) + skip;
 
-      return events;
+      return events.slice(skip, to);
 
       /**
        * Add event in an ordered way
-       * @param {Event} eventToAdd
+       * @param {Event} event
        */
-      function addEvent (eventToAdd) {
-        for (let i = 0; i < events.length; i++) {
-          if (events[i].time < eventToAdd.time) {
-            events.splice(i + 1, 0, eventToAdd); // insert at the right position
-            break;
-          }
-        }
-        events.push(eventToAdd);
+      function addEvent (event) {
+        if (!eventMatchesParamFilter(event, params)) return;
+        // warning trashed not yet handled
+        insertEventInOrderedArray(events, event, params.sortAscending);
+        return true;
       }
     },
 

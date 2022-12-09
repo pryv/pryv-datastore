@@ -26,9 +26,9 @@ function fullPathForSub (userId, itemName) {
     excludedIds: ['eJxLrUjMLchJLdYvSi0uAQAlPAVN'],
     expandChildren: 1
   }));
- 
+
   try {
-    //console.log(await fsds.streams.create('bob', { name: 'temp' }));
+    // console.log(await fsds.streams.create('bob', { name: 'temp' }));
   } catch (err) {
     console.log(err, err.messsage);
   }
@@ -36,7 +36,7 @@ function fullPathForSub (userId, itemName) {
   console.log(await fsds.streams.get('bob', { }));
 
   try {
-    $$(await fsds.events.get('bob', { streams: [{ any: ['eJwrLkoGAAKjAUk'] }] })); // src
+    $$(await fsds.events.get('bob', { skip: 1, limit: 1, streams: [{ any: ['eJwrLkoGAAKjAUk'] }] })); // src
   } catch (err) {
     console.log(err, err.messsage);
   }
