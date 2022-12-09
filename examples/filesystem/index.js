@@ -2,6 +2,9 @@ const fs = require('fs-extra');
 const ds = require('../../src'); // datastore
 const path = require('path');
 const zlib = require('zlib');
+const mrmime = require('mrmime');
+
+const streamsInspectorForStreamQuery = require('../../src/utils/streamsInspectorForStreamQuery');
 
 /**
  * Map a filesystem and exposes to Pryv
@@ -61,13 +64,11 @@ module.exports = ds.createDataStore({
   idForFullPath (userId, fullPath) {
     // remove basePath
     const subPath = this.subPathForFull(userId, fullPath);
-    if (subPath.length === 0) return null;
-    return zlib.deflateSync(subPath).toString('base64url');
+    return idForSubPath(subPath);
   },
 
   fullPathForId (userId, itemId) {
-    if (itemId == null) return this.fullPathForSub(userId, '');
-    const subPath = zlib.inflateSync(Buffer.from(itemId, 'base64url')).toString();
+    const subPath = subPathForId(itemId);
     return this.fullPathForSub(userId, subPath);
   },
 
@@ -85,6 +86,31 @@ module.exports = ds.createDataStore({
       modified: stats.ctimeMs / 1000,
       clientData: {
         path: this.subPathForFull(userId, dirFullPath)
+      }
+    };
+  },
+
+  async fileToEvent (userId, parentSubPath, fileName, streamId = null) {
+    streamId = streamId || idForSubPath(streamId);
+    const fileSubPath = path.join(parentSubPath, fileName);
+    const fileFullPath = this.fullPathForSub(userId, fileSubPath);
+    const stats = await fs.promises.stat(fileFullPath);
+    const eventId = idForSubPath(fileSubPath);
+    return {
+      id: eventId,
+      streamIds: [streamId],
+      created: stats.birthtimeMs / 1000,
+      modified: stats.ctimeMs / 1000,
+      type: 'file/attached',
+      content: null,
+      attachments: [{
+        id: 'a:' + eventId, // theis only one attachment per file
+        fileName,
+        type: mrmime.lookup(fileName),
+        size: stats.size
+      }],
+      clientData: {
+        path: fileSubPath
       }
     };
   }
@@ -126,7 +152,6 @@ function createFSUserStreams (fsds) {
     },
 
     async create (userId, streamData) {
-      console.log('CREATE >>>', userId, streamData);
       if (streamData.id != null) {
         throw ds.errors.invalidItemId(`Stream.id is read only : [${streamData.id}]`, streamData);
       }
@@ -145,7 +170,6 @@ function createFSUserStreams (fsds) {
       if ((await fs.pathExists(dirFullPath))) {
         throw ds.errors.itemAlreadyExists(`Item alredy exists with name: ${streamData.name}`, { name: streamData.name });
       }
-      console.log('CREATE DIR >>>', dirFullPath);
       await fs.mkdir(dirFullPath);
       const stream = fsds.dirToStream(userId, parentFullPath, dirFullPath, streamData.name);
       stream.children = [];
@@ -176,10 +200,74 @@ function createFSUserStreams (fsds) {
   });
 }
 
-function createFSUserEvents (rs) {
+/**
+ * convert a streamQuery with Ids to streamQuery with subPath
+ */
+function streamPathQueryForStreamQuery (streamQuery) {
+  const streamPathQuery = {};
+  for (const key of Object.keys(streamQuery)) {
+    if (key === 'and') {
+      streamPathQuery.and = streamPathQueryForStreamQuery(streamQuery.and);
+    } else { // any || not
+      streamPathQuery[key] = streamQuery[key].map(subPathForId);
+    }
+  }
+  return streamPathQuery;
+}
+
+function createFSUserEvents (fsds) {
   return ds.createUserEvents({
     async get (userId, params) {
+      // get initial list streams inspect with excluded ids
+      // NOTES
+      // - "AND" can be handled only if on of the stream is a substream of the other
+      const streamPathQuery = params.streams.map(streamPathQueryForStreamQuery);
+      const streamInspector = streamsInspectorForStreamQuery(streamPathQuery, isChildOf);
 
+      // holds all events.
+      const events = [];
+      const eventsCollectedForStreamPath = {}; // keep track of streams on which we already collected events
+
+      for (const entryStream of streamInspector.entries) {
+        await inspect(entryStream.rootStream, entryStream);
+      }
+
+      async function inspect (dirSubPath, entryStream) {
+        const dirFullPath = fsds.fullPathForSub(userId, dirSubPath);
+        const dir = await fs.promises.opendir(dirFullPath);
+        const collectEvents = !eventsCollectedForStreamPath[dirSubPath];
+        eventsCollectedForStreamPath[dirSubPath] = true;
+        const streamId = idForSubPath(dirSubPath);
+        for await (const dirent of dir) {
+          if (dirent.isDirectory()) {
+            const potentialStreamSubPath = path.join(dirSubPath, dirent.name);
+            // if this streamPath matches the entryStream, inspect it
+            if (entryStream.allows(potentialStreamSubPath)) await inspect(potentialStreamSubPath, entryStream);
+          } else {
+            if (collectEvents) {
+              const event = await fsds.fileToEvent(userId, dirSubPath, dirent.name, streamId);
+              // filter event HERE
+              addEvent(event);
+            }
+          }
+        }
+      }
+
+      return events;
+
+      /**
+       * Add event in an ordered way
+       * @param {Event} eventToAdd
+       */
+      function addEvent (eventToAdd) {
+        for (let i = 0; i < events.length; i++) {
+          if (events[i].time < eventToAdd.time) {
+            events.splice(i + 1, 0, eventToAdd); // insert at the right position
+            break;
+          }
+        }
+        events.push(eventToAdd);
+      }
     },
 
     async getStreamed (userId, params) {
@@ -204,4 +292,21 @@ function createFSUserEvents (rs) {
 
     }
   });
+}
+
+// --- utils --- //
+
+function subPathForId (itemId) {
+  if (itemId == null || itemId === '*') return '';
+  return zlib.inflateSync(Buffer.from(itemId, 'base64url')).toString();
+}
+
+function idForSubPath (subPath) {
+  if (!subPath || subPath.length === 0) return null;
+  return zlib.deflateSync(subPath).toString('base64url');
+}
+
+function isChildOf (childPath, parentPath) {
+  if (parentPath === '*') return true;
+  return childPath.startsWith(parentPath);
 }
