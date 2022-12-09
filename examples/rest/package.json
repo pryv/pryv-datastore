@@ -1,13 +1,15 @@
 {
   "name": "pryv-datastore-rest",
   "version": "0.0.1",
+  "private": true,
   "description": "Pryv DataStore to REST API",
+  "homepage": "https://pryv.com",
+  "license": "BSD-3-Clause",
+  "author": "Pryv S.A. <info@pryv.com> (https://pryv.com)",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Pryv S.A.",
-  "license": "BSD-3-Clause",
   "dependencies": {
     "express": "^4.18.2",
     "superagent": "^8.0.4"

@@ -1,13 +1,15 @@
 {
   "name": "pryv-datastore-filesystem",
   "version": "0.0.1",
+  "private": true,
   "description": "Pryv DataStore to FileSystem",
+  "homepage": "https://pryv.com",
+  "license": "BSD-3-Clause",
+  "author": "Pryv S.A. <info@pryv.com> (https://pryv.com)",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Pryv S.A.",
-  "license": "BSD-3-Clause",
   "dependencies": {
     "fs-extra": "^11.1.0",
     "mrmime": "^1.0.1"

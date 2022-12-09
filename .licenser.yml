@@ -38,6 +38,8 @@ ignore:
 - .vscode
 - coverage
 - node_modules
+- examples/filesystem/node_modules
+- examples/rest/node_modules
 
 license: |
   Copyright (C) {YEARS} {AUTHOR_NAME} {AUTHOR_WEB} - All Rights Reserved
