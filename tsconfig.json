@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "resolveJsonModule": true,
+    "noEmit": true
+  },
+  "include": ["**/*.js"],
+  "exclude": ["node_modules", "examples"],
+  "typedocOptions": {
+    "plugin": "typedoc-plugin-markdown",
+    "entryPoints": [
+      "src/index.js",
+      "src/DataStore.js",
+      "src/UserStreams.js",
+      "src/UserEvents.js",
+      "src/defaults.js",
+      "src/errors.js"
+    ],
+    "out": "docs",
+    "githubPages": false
+  }
+}

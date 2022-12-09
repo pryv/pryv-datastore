@@ -9,6 +9,22 @@
 const errors = require('./errors');
 
 /**
+ * @typedef {string} identifier
+ */
+
+/**
+ * @typedef {number} timestamp
+ */
+
+/**
+ * @typedef {object} Stream
+ */
+
+/**
+ * @typedef {object} StreamDeletionItem
+ */
+
+/**
  * Prototype object for per-user streams data.
  * {@link DataStore#streams} must return an implementation that inherits from this via {@link datastore#createUserStreams}.
  * @exports UserStreams
@@ -25,14 +41,14 @@ const UserStreams = module.exports = {
    * @param {number} [params.expandChildren=0] 0 = NO; -1 = ALL; 1.. Gives the number of levels to expand
    * @param {identifier[]} [params.excludeIds] list of streamIds to exclude from query. if expandChildren is >0 or < 0, children of excludedIds should be excludded too
    * @param {boolean} [params.includeTrashed] (equivalent to state = 'all')
-   * @returns {Stream|null} - the stream or null if not found:
+   * @returns {Promise<Stream|null>} - the stream or null if not found:
    */
   async get (userId, params) { throw errors.unsupportedOperation('streams.get'); },
 
   /**
    * Get a list of deleted ids since
    * @param {identifier} userId
-   * @param {timestamp} deletionSince
+   * @param {timestamp} deletionsSince
    */
   async getDeletions (userId, deletionsSince) { throw errors.unsupportedOperation('streams.getDeletions'); },
 
@@ -42,7 +58,7 @@ const UserStreams = module.exports = {
    * @throws item-already-exists
    * @throws invalid-item-id
    * @throws resource-is-readonly <=== Thrown either because Storage or Parent stream is readonly
-   * @returns {Stream} - The created Stream
+   * @returns {Promise<Stream>} - The created Stream
    */
   async create (userId, params) { throw errors.unsupportedOperation('streams.create'); },
 
@@ -51,7 +67,7 @@ const UserStreams = module.exports = {
    * @param {identifier} userId
    * @throws item-already-exists
    * @throws resource-is-readonly <=== Thrown because item cannot be updated
-   * @returns {Stream} - The update Stream
+   * @returns {Promise<Stream>} - The update Stream
    */
   async update (userId, streamId, params) { throw errors.unsupportedOperation('streams.update'); },
 
@@ -62,7 +78,7 @@ const UserStreams = module.exports = {
    * @param {object} params
    * @throws item-already-exists
    * @throws resource-is-readonly <=== Thrown because item cannot be updated
-   * @returns {Stream|StreamDeletionItem} - The trashed Stream
+   * @returns {Promise<Stream|StreamDeletionItem>} - The trashed Stream
    */
   async delete (userId, streamId, params) { throw errors.unsupportedOperation('streams.delete'); }
 };

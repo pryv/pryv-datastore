@@ -14,6 +14,9 @@
  * @typedef {number} timestamp - A positive floating-point number representing the number of seconds since a reference time (Unix epoch time).
  */
 
+/** @typedef {import('./UserStreams')} UserStreams */
+/** @typedef {import('./UserEvents')} UserEvents */
+
 /**
  * Data store prototype object.
  * All data store implementations inherit from this via {@link datastore#createDataStore}.
@@ -70,7 +73,7 @@ const DataStore = module.exports = {
    * Get store-specific key-value data for the given user.
    * This should never return secrets such as passwords, tokens etc. which should be write-only via {@link #setUserData}.
    * @param {identifier} userId
-   * @returns {object}
+   * @returns {Promise<object>}
    */
   async getUserData (userId) { throw new Error('Not implemented'); }, // eslint-disable-line no-unused-vars
 
@@ -83,7 +86,7 @@ const DataStore = module.exports = {
   /**
    * Return the total amount of storage used by the given user, in bytes.
    * @param {identifier} userId
-   * @returns {number}
+   * @returns {Promise<number>}
    */
   async getUserStorageSize (userId) { throw new Error('Not implemented'); } // eslint-disable-line no-unused-vars
 };
