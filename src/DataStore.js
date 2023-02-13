@@ -43,7 +43,7 @@ const DataStore = module.exports = {
 
   /**
    * Initialize the store.
-   * @returns {DataStore} The data store object itself (for method chaining).
+   * @returns {Promise<DataStore>} The data store object itself (for method chaining).
    */
   async init () { throw new Error('Not implemented'); },
 

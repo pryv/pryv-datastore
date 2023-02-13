@@ -5,18 +5,20 @@
  * under the terms of the 3-Clause BSD License
  * SPDX-License-Identifier: BSD-3-Clause
  */
+
 /**
- * @typedef {
- *  rootStream: string
- *  allows: callback
- * } streamQueryEntry
+ * @callback callback
  */
 
 /**
- * Utility for streamqueries when the storage support isChildOf fast resolution.
+ * @typedef {{ rootStream: string, allows: callback }} StreamQueryEntry
+ */
+
+/**
+ * Utility for stream queries when storage supports `isChildOf()` fast resolution.
  * @param {*} streamQuery - a StreamQuery
- * @param {*} isChildOf - a Function taking two parameters
- * @returns { entries: Array<streamQueryEntry> }
+ * @param {*} isChildOf - a function taking two parameters
+ * @returns {{ entries: Array<StreamQueryEntry> }}
  */
 module.exports = function streamsInspectorForStreamQuery (streamQuery, isChildOf) {
   const entries = [];

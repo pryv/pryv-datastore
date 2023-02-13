@@ -16,7 +16,6 @@ install *params: clean
 # Clean up node modules
 clean:
     rm -rf node_modules
-    rm -rf components/**/node_modules
 
 # –––––––––––––----------------------------------------------------------------
 # Test & related
