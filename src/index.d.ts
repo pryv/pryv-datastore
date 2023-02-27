@@ -1,3 +1,4 @@
+import DataStore = require("./DataStore");
 import UserEvents = require("./UserEvents");
 import defaults = require("./defaults");
 import errors = require("./errors");
@@ -7,10 +8,7 @@ import errors = require("./errors");
  * @returns {DataStore}
  */
 export declare function createDataStore(implementation: any): {
-    id: string;
-    name: string;
-    settings: any;
-    init(): any;
+    init(settings: any, keyValueDB: DataStore.KeyValueDB): Promise<any>;
     streams: {
         get(userId: string, params: {
             id?: string;
@@ -38,8 +36,6 @@ export declare function createDataStore(implementation: any): {
         update(userId: string, eventData: any): Promise<boolean>;
         delete(userId: string, eventId: string, params: any): Promise<any>;
     };
-    setUserData(userId: string, data: any): Promise<never>;
-    getUserData(userId: string): Promise<any>;
     deleteUser(userId: string): Promise<never>;
     getUserStorageSize(userId: string): Promise<number>;
 };

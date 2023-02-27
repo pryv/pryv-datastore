@@ -6,15 +6,7 @@ export type identifier = string;
  * - A positive floating-point number representing the number of seconds since a reference time (Unix epoch time).
  */
 export type timestamp = number;
-declare const id: string;
-declare const name: string;
-declare const settings: object;
-/**
- * Initialize the store.
- * @returns {DataStore} The data store object itself (for method chaining).
- */
-declare function init(): any;
-declare const streams: {
+export type UserStreams = {
     get(userId: string, params: {
         id?: string;
         expandChildren?: number;
@@ -26,7 +18,7 @@ declare const streams: {
     update(userId: string, streamId: any, params: any): Promise<any>;
     delete(userId: string, streamId: string, params: any): Promise<any>;
 };
-declare const events: {
+export type UserEvents = {
     get(userId: string, params: {
         withDeletions?: boolean;
         deletedSince?: number;
@@ -41,22 +33,32 @@ declare const events: {
     update(userId: string, eventData: any): Promise<boolean>;
     delete(userId: string, eventId: string, params: any): Promise<any>;
 };
+export type FnKeyValueGetAll = (userId: identifier) => object;
+export type FnKeyValueGet = (userId: identifier, key: string) => any;
+export type FnKeyValueSet = (userId: identifier, key: string, value: any) => void;
+export type KeyValueDB = {
+    /**
+     * Get all key-value data for the given user.
+     */
+    getAll: FnKeyValueGetAll;
+    /**
+     * Get key-value data for the given user.
+     */
+    get: FnKeyValueGet;
+    /**
+     * Set key-value data for the given user.
+     */
+    set: FnKeyValueSet;
+};
 /**
- * TODO: implement
- * Set store-specific key-value data (e.g. credentials or settings) for the given user.
- * This is called for both creating and updating the data.
- * @param {identifier} userId
- * @param {object} data
+ * Initialize the store.
+ * @param {object} settings The data store's configuration settings (loaded from platform settings at creation).
+ * @param {KeyValueDB} keyValueDB A store-specific key-value database for user data (e.g. credentials or settings).
+ * @returns {Promise<DataStore>} The data store object itself (for method chaining).
  */
-declare function setUserData(userId: string, data: any): Promise<never>;
-/**
- * TODO: implement
- * Get store-specific key-value data for the given user.
- * This should never return secrets such as passwords, tokens etc. which should be write-only via {@link #setUserData}.
- * @param {identifier} userId
- * @returns {Promise<object>}
- */
-declare function getUserData(userId: string): Promise<any>;
+declare function init(settings: any, keyValueDB: KeyValueDB): Promise<any>;
+declare const streams: UserStreams;
+declare const events: UserEvents;
 /**
  * Called when the given user is deleted from Pryv.io, to let the store delete the related data if appropriate.
  * @param {identifier} userId

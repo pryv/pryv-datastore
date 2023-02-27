@@ -8,7 +8,7 @@ export type StreamDeletionItem = object;
  * @param {identifier} userId
  * @param {object} params
  * @param {identifier} [params.id] null, means root streamId. Notice parentId is not implemented by stores
- * @param {number} [params.expandChildren=false] <-- TODO check if correct
+ * @param {number} [params.expandChildren=0] 0 = NO; -1 = ALL; 1.. Gives the number of levels to expand
  * @param {identifier[]} [params.excludeIds] list of streamIds to exclude from query. if expandChildren is >0 or < 0, children of excludedIds should be excludded too
  * @param {boolean} [params.includeTrashed] (equivalent to state = 'all')
  * @returns {Promise<Stream|null>} - the stream or null if not found:

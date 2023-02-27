@@ -7,75 +7,30 @@
  */
 
 /**
- * @typedef {string} identifier - A string uniquely identifying an object (user, event, stream, etc.)
- */
-
-/**
- * @typedef {number} timestamp - A positive floating-point number representing the number of seconds since a reference time (Unix epoch time).
- */
-
-/** @typedef {import('./UserStreams')} UserStreams */
-/** @typedef {import('./UserEvents')} UserEvents */
-
-/**
  * Data store prototype object.
  * All data store implementations inherit from this via {@link datastore#createDataStore}.
  * @exports DataStore
  */
 const DataStore = module.exports = {
   /**
-   * The data store's unique identifier (loaded from Pryv.io platform settings at creation).
-   * @type {string}
-   */
-  id: '',
-
-  /**
-   * The data store's name (loaded from Pryv.io platform settings at creation).
-   * @type {string}
-   */
-  name: '',
-
-  /**
-   * The data store's configuration settings (loaded from platform settings at creation).
-   * @type {object}
-   */
-  settings: {},
-
-  /**
    * Initialize the store.
+   * @param {object} settings The data store's configuration settings (loaded from platform settings at creation).
+   * @param {KeyValueDB} keyValueDB A store-specific key-value database for user data (e.g. credentials or settings).
    * @returns {Promise<DataStore>} The data store object itself (for method chaining).
    */
-  async init () { throw new Error('Not implemented'); },
+  async init (settings, keyValueDB) { throw new Error('Not implemented'); },
 
   /**
-   * The {@link UserStreams} implementation.
+   * The {@link UserStreams} implementation. Must be set in {@link init}.
    * @type {UserStreams}
    */
   streams: null,
 
   /**
-   * The {@link UserEvents} implementation.
+   * The {@link UserEvents} implementation. Must be set in {@link init}.
    * @type {UserEvents}
    */
   events: null,
-
-  /**
-   * TODO: implement
-   * Set store-specific key-value data (e.g. credentials or settings) for the given user.
-   * This is called for both creating and updating the data.
-   * @param {identifier} userId
-   * @param {object} data
-   */
-  async setUserData (userId, data) { throw new Error('Not implemented'); }, // eslint-disable-line no-unused-vars
-
-  /**
-   * TODO: implement
-   * Get store-specific key-value data for the given user.
-   * This should never return secrets such as passwords, tokens etc. which should be write-only via {@link #setUserData}.
-   * @param {identifier} userId
-   * @returns {Promise<object>}
-   */
-  async getUserData (userId) { throw new Error('Not implemented'); }, // eslint-disable-line no-unused-vars
 
   /**
    * Called when the given user is deleted from Pryv.io, to let the store delete the related data if appropriate.
@@ -95,3 +50,42 @@ const DataStore = module.exports = {
 for (const propName of Object.getOwnPropertyNames(DataStore)) {
   Object.defineProperty(DataStore, propName, { configurable: false });
 }
+
+/**
+ * @typedef {string} identifier - A string uniquely identifying an object (user, event, stream, etc.)
+ */
+
+/**
+ * @typedef {number} timestamp - A positive floating-point number representing the number of seconds since a reference time (Unix epoch time).
+ */
+
+/** @typedef {import('./UserStreams')} UserStreams */
+/** @typedef {import('./UserEvents')} UserEvents */
+
+/**
+ * @callback FnKeyValueGetAll
+ * @param {identifier} userId
+ * @returns {object}
+ */
+
+/**
+ * @callback FnKeyValueGet
+ * @param {identifier} userId
+ * @param {string} key
+ * @returns {*}
+ */
+
+/**
+ * @callback FnKeyValueSet
+ * @param {identifier} userId
+ * @param {string} key
+ * @param {*} value
+ * @returns {void}
+ */
+
+/**
+ * @typedef {object} KeyValueDB
+ * @property {FnKeyValueGetAll} getAll Get all key-value data for the given user.
+ * @property {FnKeyValueGet} get Get key-value data for the given user.
+ * @property {FnKeyValueSet} set Set key-value data for the given user.
+ */
