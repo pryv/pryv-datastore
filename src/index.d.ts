@@ -11,7 +11,7 @@ export declare function createDataStore(implementation: any): {
     readonly id: string;
     readonly name: string;
     readonly settings: any;
-    init(keyValueDB: DataStore.KeyValueDB): Promise<any>;
+    init(keyValueData: DataStore.KeyValueData): Promise<any>;
     streams: {
         get(userId: string, params: {
             id?: string;

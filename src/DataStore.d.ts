@@ -36,7 +36,7 @@ export type UserEvents = {
 export type FnKeyValueGetAll = (userId: identifier) => object;
 export type FnKeyValueGet = (userId: identifier, key: string) => any;
 export type FnKeyValueSet = (userId: identifier, key: string, value: any) => void;
-export type KeyValueDB = {
+export type KeyValueData = {
     /**
      * Get all key-value data for the given user.
      */
@@ -55,10 +55,10 @@ declare const name: string;
 declare const settings: object;
 /**
  * Initialize the store.
- * @param {KeyValueDB} keyValueDB A store-specific key-value database for user data (e.g. credentials or settings).
+ * @param {KeyValueData} keyValueData A store-specific key-value database for user data (e.g. credentials or settings).
  * @returns {Promise<DataStore>} The data store object itself (for method chaining).
  */
-declare function init(keyValueDB: KeyValueDB): Promise<any>;
+declare function init(keyValueData: KeyValueData): Promise<any>;
 declare const streams: UserStreams;
 declare const events: UserEvents;
 /**

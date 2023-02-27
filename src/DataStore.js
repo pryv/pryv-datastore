@@ -35,10 +35,10 @@ const DataStore = module.exports = {
 
   /**
    * Initialize the store.
-   * @param {KeyValueDB} keyValueDB A store-specific key-value database for user data (e.g. credentials or settings).
+   * @param {KeyValueData} keyValueData A store-specific key-value database for user data (e.g. credentials or settings).
    * @returns {Promise<DataStore>} The data store object itself (for method chaining).
    */
-  async init (keyValueDB) { throw new Error('Not implemented'); },
+  async init (keyValueData) { throw new Error('Not implemented'); },
 
   /**
    * The {@link UserStreams} implementation. Must be set in {@link init}.
@@ -104,7 +104,7 @@ for (const propName of Object.getOwnPropertyNames(DataStore)) {
  */
 
 /**
- * @typedef {object} KeyValueDB
+ * @typedef {object} KeyValueData
  * @property {FnKeyValueGetAll} getAll Get all key-value data for the given user.
  * @property {FnKeyValueGet} get Get key-value data for the given user.
  * @property {FnKeyValueSet} set Set key-value data for the given user.
