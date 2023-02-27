@@ -13,12 +13,32 @@
  */
 const DataStore = module.exports = {
   /**
+   * The data store's unique identifier, loaded from Pryv.io platform settings at creation.
+   * @readonly
+   * @type {string}
+   */
+  id: '',
+
+  /**
+   * The data store's name, loaded from Pryv.io platform settings at creation.
+   * @readonly
+   * @type {string}
+   */
+  name: '',
+
+  /**
+   * The data store's configuration settings, loaded from platform settings at creation.
+   * @readonly
+   * @type {object}
+   */
+  settings: {},
+
+  /**
    * Initialize the store.
-   * @param {object} settings The data store's configuration settings (loaded from platform settings at creation).
    * @param {KeyValueDB} keyValueDB A store-specific key-value database for user data (e.g. credentials or settings).
    * @returns {Promise<DataStore>} The data store object itself (for method chaining).
    */
-  async init (settings, keyValueDB) { throw new Error('Not implemented'); },
+  async init (keyValueDB) { throw new Error('Not implemented'); },
 
   /**
    * The {@link UserStreams} implementation. Must be set in {@link init}.

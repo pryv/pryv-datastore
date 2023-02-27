@@ -8,7 +8,10 @@ import errors = require("./errors");
  * @returns {DataStore}
  */
 export declare function createDataStore(implementation: any): {
-    init(settings: any, keyValueDB: DataStore.KeyValueDB): Promise<any>;
+    readonly id: string;
+    readonly name: string;
+    readonly settings: any;
+    init(keyValueDB: DataStore.KeyValueDB): Promise<any>;
     streams: {
         get(userId: string, params: {
             id?: string;

@@ -50,13 +50,15 @@ export type KeyValueDB = {
      */
     set: FnKeyValueSet;
 };
+declare const id: string;
+declare const name: string;
+declare const settings: object;
 /**
  * Initialize the store.
- * @param {object} settings The data store's configuration settings (loaded from platform settings at creation).
  * @param {KeyValueDB} keyValueDB A store-specific key-value database for user data (e.g. credentials or settings).
  * @returns {Promise<DataStore>} The data store object itself (for method chaining).
  */
-declare function init(settings: any, keyValueDB: KeyValueDB): Promise<any>;
+declare function init(keyValueDB: KeyValueDB): Promise<any>;
 declare const streams: UserStreams;
 declare const events: UserEvents;
 /**
