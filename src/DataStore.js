@@ -13,32 +13,11 @@
  */
 const DataStore = module.exports = {
   /**
-   * The data store's unique identifier, loaded from Pryv.io platform settings at creation.
-   * @readonly
-   * @type {string}
-   */
-  id: '',
-
-  /**
-   * The data store's name, loaded from Pryv.io platform settings at creation.
-   * @readonly
-   * @type {string}
-   */
-  name: '',
-
-  /**
-   * The data store's configuration settings, loaded from platform settings at creation.
-   * @readonly
-   * @type {object}
-   */
-  settings: {},
-
-  /**
    * Initialize the store.
-   * @param {KeyValueData} keyValueData A store-specific key-value database for user data (e.g. credentials or settings).
+   * @param {StoreInitializationParams} params 
    * @returns {Promise<DataStore>} The data store object itself (for method chaining).
    */
-  async init (keyValueData) { throw new Error('Not implemented'); },
+  async init (params) { throw new Error('Not implemented'); },
 
   /**
    * The {@link UserStreams} implementation. Must be set in {@link init}.
@@ -108,4 +87,27 @@ for (const propName of Object.getOwnPropertyNames(DataStore)) {
  * @property {FnKeyValueGetAll} getAll Get all key-value data for the given user.
  * @property {FnKeyValueGet} get Get key-value data for the given user.
  * @property {FnKeyValueSet} set Set key-value data for the given user.
+ */
+
+/**
+ * @typedef {object} StoreInitializationParams
+ * @property {identifier} id the store's Id, used to namespace streamIds and eventIds (informative)
+ * @property {string} name the store's Name, used as root stream's name for this store (informative)
+ * @property {object} setting the custom settings set in the platform configuration files
+ * @property {KeyValueData} storeKeyValueData utility to save per-user data
+ * @property {Logger} logger
+ */
+
+/**
+ * @callback FnLog
+ * @param {string} text a comment
+ * @param {...object} meta - Meta information to 
+ */
+
+/**
+ * @typedef Logger
+ * @property {FnLog} log - log with 'info' level
+ * @property {FnLog} warn - log with 'waring' level
+ * @property {FnLog} error - log with 'error' level
+ * @property {FnLog} debug - log with 'debug' level
  */
