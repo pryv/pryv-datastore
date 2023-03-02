@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "lib": ["es2020", "DOM"],
+    "moduleResolution": "node",
+    "module": "CommonJS",
     "allowJs": true,
     "checkJs": true,
     "resolveJsonModule": true,
