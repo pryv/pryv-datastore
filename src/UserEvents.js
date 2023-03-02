@@ -53,31 +53,47 @@ const UserEvents = module.exports = {
 
   /**
    * Get events for this user.
-   * @see [Get events in Pryv.io API reference](https://api.pryv.com/reference/#get-events)
    * @param {identifier} userId
-   * @param {object} params - Query parameters
-   * @param {boolean} [params.withDeletions=false] - Include event deletions in the results.
-   * @param {timestamp} [params.deletedSince=null] -  Only return deleted events, sorted by deletion date descending.
-   * @param {boolean} [params.includeHistory=false] - Include change history for events.
+   * @param {GetEventQuery} params - Query parameters
    * @returns {Promise<Event[]>}
    */
   async get (userId, params) { throw errors.unsupportedOperation('events.get'); },
 
   /**
    * Get events as a stream for this user.
-   * @see [Get events in Pryv.io API reference](https://api.pryv.com/reference/#get-events)
    * @param {identifier} userId
-   * @param {object} params - event query
-   * @returns {Promise<ReadableStream>}
+   * @param {GetEventQuery} params - event query
+   * @returns {Promise<ReadableStream<Event>>}
    */
   async getStreamed (userId, params) { throw errors.unsupportedOperation('events.getStreamed'); },
 
   /**
-   * TODO: implement
    * @param {identifier} userId
    * @param {identifier} eventId
+   * @return {Promise<Event|null>}
    */
   async getOne (userId, eventId) { throw errors.unsupportedOperation('events.getOne'); },
+
+  /**
+   * @param {identifier} userId
+   * @param {timestamp} deletedSince
+   * @param {number} [limit]
+   * @param {number} [skip]
+   * @param {boolean} [sortAscending]
+   * @returns {Promise<ReadableStream<EventDeletionItem>>}
+   */
+  async getDeletionsStreamed (userId, deletedSince, limit = null, skip = null, sortAscending = false) { 
+    throw errors.unsupportedOperation('events.getDeletionsStreamed'); 
+  },
+
+  /**
+   * @param {identifier} userId
+   * @param {identifier} eventId
+   * @returns {Promise<Event[]>}
+   */
+  async getHistory (userId, eventId) {
+    throw errors.unsupportedOperation('events.getHistory'); 
+  },
 
   /**
    * @see [Create events in Pryv.io API reference](https://api.pryv.com/reference/#create-event)
@@ -92,43 +108,43 @@ const UserEvents = module.exports = {
 
   /**
    * @param {identifier} userId
-   * @param {object} partialEventData - eventData (without the new attachments and integrity property)
+   * @param {identifier} eventId
    * @param {AttachmentItem[]} attachmentsItems - Array of attachments informations.
    * @throws {PryvDataStoreError} with id `item-already-exists`
    * @throws {PryvDataStoreError} with id `invalid-item-id`
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
    * @returns {Promise<AttachmentResponseItem>} - The ids and other information related to the attachments
    */
-  async saveAttachedFiles (userId, partialEventData, attachmentsItems) { throw errors.unsupportedOperation('events.saveAttachedFiles'); },
+  async saveAttachedFiles (userId, eventId, attachmentsItems) { throw errors.unsupportedOperation('events.saveAttachedFiles'); },
 
   /**
    * Retrieve the specified file as a stream.
    * @param {identifier} userId
-   * @param {object} eventData
+   * @param {identified} eventId
    * @param {identifier} fileId
    * @returns {Promise<ReadableStream>}
    */
-  async getAttachedFile (userId, eventData, fileId) { throw errors.unsupportedOperation('events.getAttachedFile'); },
+  async getAttachedFile (userId, eventId, fileId) { throw errors.unsupportedOperation('events.getAttachedFile'); },
 
   /**
    * Delete the specified file.
    * @param {identifier} userId
-   * @param {any} eventData
+   * @param {identifier} eventId
    * @param {identifier} fileId
    * @throws {PryvDataStoreError} with id `invalid-item-id`
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
    * @returns {Promise<AttachmentResponseItem>} - The ids and other information related to the attachments
    */
-  async deleteAttachedFile (userId, eventData, fileId) { throw errors.unsupportedOperation('events.deleteAttachedFile'); },
+  async deleteAttachedFile (userId, eventId, fileId) { throw errors.unsupportedOperation('events.deleteAttachedFile'); },
 
   /**
    * Fully replace an event with new Data
    * @param {identifier} userId
-   * @param {any} eventData - New event data
+   * @param {Event} event - New event data
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
    * @returns {Promise<boolean>} - true if an event was updated
    */
-  async update (userId, eventData) { throw errors.unsupportedOperation('events.replace'); },
+  async update (userId, event) { throw errors.unsupportedOperation('events.replace'); },
 
   /**
    * @see https://api.pryv.com/reference/#delete-event
