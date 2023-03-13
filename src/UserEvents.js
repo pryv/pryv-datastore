@@ -54,18 +54,20 @@ const UserEvents = module.exports = {
   /**
    * Get events for this user.
    * @param {identifier} userId
-   * @param {GetEventQuery} params - Query parameters
+   * @param {GetEventQuery} query Event query
+   * @param {{skip, limit, sort}} options
    * @returns {Promise<Event[]>}
    */
-  async get (userId, params) { throw errors.unsupportedOperation('events.get'); },
+  async get (userId, query, options) { throw errors.unsupportedOperation('events.get'); },
 
   /**
    * Get events as a stream for this user.
    * @param {identifier} userId
-   * @param {GetEventQuery} params - event query
+   * @param {GetEventQuery} query Event query
+   * @param {{skip, limit, sort}} options
    * @returns {Promise<ReadableStream<Event>>}
    */
-  async getStreamed (userId, params) { throw errors.unsupportedOperation('events.getStreamed'); },
+  async getStreamed (userId, query, options) { throw errors.unsupportedOperation('events.getStreamed'); },
 
   /**
    * @param {identifier} userId
@@ -76,14 +78,12 @@ const UserEvents = module.exports = {
 
   /**
    * @param {identifier} userId
-   * @param {timestamp} deletedSince
-   * @param {number} [limit]
-   * @param {number} [skip]
-   * @param {boolean} [sortAscending]
+   * @param {{deletedSince: timestamp}} query
+   * @param {{skip: number, limit: number, sortAscending: boolean}} [options]
    * @returns {Promise<ReadableStream<EventDeletionItem>>}
    */
-  async getDeletionsStreamed (userId, deletedSince, limit = null, skip = null, sortAscending = false) { 
-    throw errors.unsupportedOperation('events.getDeletionsStreamed'); 
+  async getDeletionsStreamed (userId, query, options) {
+    throw errors.unsupportedOperation('events.getDeletionsStreamed');
   },
 
   /**
@@ -92,7 +92,7 @@ const UserEvents = module.exports = {
    * @returns {Promise<Event[]>}
    */
   async getHistory (userId, eventId) {
-    throw errors.unsupportedOperation('events.getHistory'); 
+    throw errors.unsupportedOperation('events.getHistory');
   },
 
   /**
