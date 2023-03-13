@@ -14,7 +14,7 @@
 const DataStore = module.exports = {
   /**
    * Initialize the store.
-   * @param {StoreInitializationParams} params 
+   * @param {StoreInitializationParams} params
    * @returns {Promise<DataStore>} The data store object itself (for method chaining).
    */
   async init (params) { throw new Error('Not implemented'); },
@@ -91,23 +91,23 @@ for (const propName of Object.getOwnPropertyNames(DataStore)) {
 
 /**
  * @typedef {object} StoreInitializationParams
- * @property {identifier} id the store's Id, used to namespace streamIds and eventIds (informative)
- * @property {string} name the store's Name, used as root stream's name for this store (informative)
- * @property {object} setting the custom settings set in the platform configuration files
- * @property {KeyValueData} storeKeyValueData utility to save per-user data
- * @property {Logger} logger
+ * @property {identifier} id The store's id as defined in the Pryv.io platform configuration (for information)
+ * @property {string} name The store's name as defined in the Pryv.io platform configuration (for information; names the root stream representing the store)
+ * @property {object} settings The store's settings as defined in the Pryv.io platform configuration
+ * @property {KeyValueData} storeKeyValueData Utility to save per-user data
+ * @property {Logger} logger Logger for the store (messages will appear in the Pryv.io core logs)
  */
 
 /**
  * @callback FnLog
- * @param {string} text a comment
- * @param {...object} meta - Meta information to 
+ * @param {string} message The log message
+ * @param {...any} [context] Any additional contextual information
  */
 
 /**
  * @typedef Logger
- * @property {FnLog} log - log with 'info' level
- * @property {FnLog} warn - log with 'waring' level
- * @property {FnLog} error - log with 'error' level
- * @property {FnLog} debug - log with 'debug' level
+ * @property {FnLog} log Log message with 'info' level
+ * @property {FnLog} warn Log message with 'warning' level
+ * @property {FnLog} error Log message with 'error' level
+ * @property {FnLog} debug Log message with 'debug' level
  */

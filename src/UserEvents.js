@@ -120,7 +120,7 @@ const UserEvents = module.exports = {
   /**
    * Retrieve the specified file as a stream.
    * @param {identifier} userId
-   * @param {identified} eventId
+   * @param {identifier} eventId
    * @param {identifier} fileId
    * @returns {Promise<ReadableStream>}
    */
