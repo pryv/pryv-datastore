@@ -6,12 +6,12 @@ const mrmime = require('mrmime');
 const ds = require('../../src'); // datastore
 
 const { isChildOf, idForSubPath, subPathForId } = require('./pathUtils');
-const streamsInspectorForStreamQuery = require('../../src/utils/streamsInspectorForStreamQuery');
+const streamsInspectorForStreamQuery = require('../utils/streamsInspectorForStreamQuery');
 const {
   insertEventInOrderedArray,
   eventMatchesParamFilter,
   stripArrayResultFromParams
-} = require('../../src/utils/eventResultsUtils');
+} = require('../utils/eventResultsUtils');
 
 module.exports = function createFSUserEvents (fsds) {
   return ds.createUserEvents({
