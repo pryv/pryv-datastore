@@ -15,7 +15,7 @@ export declare function createDataStore(implementation: any): {
     streams: {
         get(userId: string, params: {
             id?: string;
-            expandChildren?: number;
+            childrenDepth?: number;
             excludeIds?: string[];
             includeTrashed?: boolean;
         }): Promise<any>;
@@ -50,7 +50,7 @@ export declare function createDataStore(implementation: any): {
 export declare function createUserStreams(implementation: any): {
     get(userId: string, params: {
         id?: string;
-        expandChildren?: number;
+        childrenDepth?: number;
         excludeIds?: string[];
         includeTrashed?: boolean;
     }): Promise<any>;

@@ -24,7 +24,7 @@ function fullPathForSub (userId, itemName) {
   console.log(await fsds.streams.get('bob', {
     id: 'examples',
     excludedIds: ['eJxLrUjMLchJLdYvSi0uAQAlPAVN'],
-    expandChildren: 1
+    childrenDepth: 1
   }));
 
   try {

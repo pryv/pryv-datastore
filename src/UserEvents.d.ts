@@ -25,35 +25,47 @@ export type AttachmentItem = {
  * Informations sent by the store after saving attachment
  */
 export type AttachmentResponseItem = object;
+
 /**
- * Get events for this user.
- * @see [Get events in Pryv.io API reference](https://api.pryv.com/reference/#get-events)
- * @param {identifier} userId
- * @param {object} params - Query parameters
- * @param {boolean} [params.withDeletions=false] - Include event deletions in the results.
- * @param {timestamp} [params.deletedSince=null] -  Only return deleted events, sorted by deletion date descending.
- * @param {boolean} [params.includeHistory=false] - Include change history for events.
- * @returns {Promise<Event[]>}
- */
-export declare function get(userId: string, params: {
-    withDeletions?: boolean;
-    deletedSince?: number;
-    includeHistory?: boolean;
-}): Promise<any[]>;
-/**
- * Get events as a stream for this user.
- * @see [Get events in Pryv.io API reference](https://api.pryv.com/reference/#get-events)
- * @param {identifier} userId
- * @param {object} params - event query
- * @returns {Promise<ReadableStream>}
- */
-export declare function getStreamed(userId: string, params: any): Promise<ReadableStream<any>>;
-/**
- * TODO: implement
  * @param {identifier} userId
  * @param {identifier} eventId
+ * @return {Promise<Event|null>}
  */
-export declare function getOne(userId: string, eventId: string): Promise<never>;
+export declare function getOne(userId: string, eventId: string): Promise<Event|null>;
+
+/**
+ * Get events for this user.
+ * @param {identifier} userId
+ * @param {GetEventQuery} query Event query
+ * @param {{skip, limit, sort}} options
+ * @returns {Promise<Event[]>}
+ */
+export declare function get(userId: string, query: GetEventQuery, options: GetEventOptions): Promise<Events[]>;
+/**
+ * Get events as a stream for this user.
+ * @param {identifier} userId
+ * @param {GetEventQuery} query Event query
+ * @param {{skip, limit, sort}} options
+ * @returns {Promise<ReadableStream<Event>>}
+ */
+export declare function getStreamed(userId: string, query: GetEventQuery, options: GetEventOptions): Promise<ReadableStream<Event>>;
+
+/**
+ * @param {identifier} userId
+ * @param {{deletedSince: timestamp}} query
+ * @param {{skip: number, limit: number, sortAscending: boolean}} [options]
+ * @returns {Promise<ReadableStream<EventDeletionItem>>}
+ */
+export declare function  getDeletionsStreamed (userId:string, query: {deletedSince: timestamp} , options: {skip: number, limit: number, sortAscending: boolean}): Promise<ReadableStream<EventDeletionItem>>;
+
+/**
+ * Get history of this event
+ * @param {identifier} userId
+ * @param {identifier} eventId
+ * @returns {Promise<Event[]>}
+ */
+export declare function getHistory(userId: string, eventsId: string): Promise<Events[]>
+
 /**
  * @see [Create events in Pryv.io API reference](https://api.pryv.com/reference/#create-event)
  * @param {identifier} userId
@@ -63,17 +75,17 @@ export declare function getOne(userId: string, eventId: string): Promise<never>;
  * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
  * @returns {Promise<Event>} - The created event
  */
-export declare function create(userId: string, eventData: any): Promise<any>;
+export declare function create(userId: string, eventData: any): Promise<Event>;
 /**
  * @param {identifier} userId
- * @param {object} partialEventData - eventData (without the new attachments and integrity property)
+ * @param {identifier} eventId
  * @param {AttachmentItem[]} attachmentsItems - Array of attachments informations.
  * @throws {PryvDataStoreError} with id `item-already-exists`
  * @throws {PryvDataStoreError} with id `invalid-item-id`
  * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
  * @returns {Promise<AttachmentResponseItem>} - The ids and other information related to the attachments
  */
-export declare function saveAttachedFiles(userId: string, partialEventData: any, attachmentsItems: AttachmentItem[]): Promise<any>;
+export declare function saveAttachedFiles(userId: string, eventId: string, attachmentsItems: AttachmentItem[]): Promise<AttachmentResponseItem>;
 /**
  * Retrieve the specified file as a stream.
  * @param {identifier} userId
@@ -91,7 +103,7 @@ export declare function getAttachedFile(userId: string, eventData: any, fileId: 
  * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
  * @returns {Promise<AttachmentResponseItem>} - The ids and other information related to the attachments
  */
-export declare function deleteAttachedFile(userId: string, eventData: any, fileId: string): Promise<any>;
+export declare function deleteAttachedFile(userId: string, eventData: any, fileId: string): Promise<AttachmentResponseItem>;
 /**
  * Fully replace an event with new Data
  * @param {identifier} userId
@@ -104,10 +116,9 @@ export declare function update(userId: string, eventData: any): Promise<boolean>
  * @see https://api.pryv.com/reference/#delete-event
  * @param {identifier} userId
  * @param {identifier} eventId
- * @param {object} params
  * @throws {PryvDataStoreError} with id `item-already-exists`
  * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
  * @returns {Promise<Event|EventDeletionItem>} - The trashed Event
  */
-declare function _delete(userId: string, eventId: string, params: any): Promise<any>;
+declare function _delete(userId: string, eventId: string): Promise<any>;
 export { _delete as delete };

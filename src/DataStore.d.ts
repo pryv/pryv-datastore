@@ -9,7 +9,7 @@ export type timestamp = number;
 export type UserStreams = {
     get(userId: string, params: {
         id?: string;
-        expandChildren?: number;
+        childrenDepth?: number;
         excludeIds?: string[];
         includeTrashed?: boolean;
     }): Promise<any>;

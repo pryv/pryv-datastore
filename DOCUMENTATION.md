@@ -595,8 +595,8 @@ Get the stream that will be set as root for all Stream Structure of this Data St
 | userId | [<code>identifier</code>](#identifier) |  |  |
 | params | <code>object</code> |  |  |
 | [params.id] | [<code>identifier</code>](#identifier) |  | null, means root streamId. Notice parentId is not implemented by stores |
-| [params.expandChildren] | <code>number</code> | <code>false</code> | <-- TODO check if correct |
-| [params.excludeIds] | [<code>Array.&lt;identifier&gt;</code>](#identifier) |  | list of streamIds to exclude from query. if expandChildren is >0 or < 0, children of excludedIds should be excludded too |
+| [params.childrenDepth] | <code>number</code> | <code>false</code> | <-- TODO check if correct |
+| [params.excludeIds] | [<code>Array.&lt;identifier&gt;</code>](#identifier) |  | list of streamIds to exclude from query. if childrenDepth is >0 or < 0, children of excludedIds should be excludded too |
 | [params.includeTrashed] | <code>boolean</code> |  | (equivalent to state = 'all') |
 
 <a name="module_UserStreams.getDeletions"></a>

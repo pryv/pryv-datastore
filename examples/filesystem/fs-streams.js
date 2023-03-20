@@ -7,7 +7,7 @@ module.exports = function createFSUserStreams (fsds) {
   return ds.createUserStreams({
     async get (userId, params) {
       const parentFullPath = fsds.fullPathForSub(userId, params.id);
-      const maxDepth = params.expandChildren || 0;
+      const maxDepth = params.childrenDepth || 0;
       const excludedIds = params.excludedIds || [];
       return await loop(parentFullPath, maxDepth);
 

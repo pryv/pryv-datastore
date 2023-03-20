@@ -52,6 +52,13 @@ const UserEvents = module.exports = {
   /* eslint-disable no-unused-vars */
 
   /**
+   * @param {identifier} userId
+   * @param {identifier} eventId
+   * @return {Promise<Event|null>}
+   */
+  async getOne (userId, eventId) { throw errors.unsupportedOperation('events.getOne'); },
+
+  /**
    * Get events for this user.
    * @param {identifier} userId
    * @param {GetEventQuery} query Event query
@@ -68,13 +75,6 @@ const UserEvents = module.exports = {
    * @returns {Promise<ReadableStream<Event>>}
    */
   async getStreamed (userId, query, options) { throw errors.unsupportedOperation('events.getStreamed'); },
-
-  /**
-   * @param {identifier} userId
-   * @param {identifier} eventId
-   * @return {Promise<Event|null>}
-   */
-  async getOne (userId, eventId) { throw errors.unsupportedOperation('events.getOne'); },
 
   /**
    * @param {identifier} userId
@@ -140,22 +140,21 @@ const UserEvents = module.exports = {
   /**
    * Fully replace an event with new Data
    * @param {identifier} userId
-   * @param {Event} event - New event data
+   * @param {Event} eventData - New event data
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
    * @returns {Promise<boolean>} - true if an event was updated
    */
-  async update (userId, event) { throw errors.unsupportedOperation('events.replace'); },
+  async update (userId, eventData) { throw errors.unsupportedOperation('events.replace'); },
 
   /**
    * @see https://api.pryv.com/reference/#delete-event
    * @param {identifier} userId
    * @param {identifier} eventId
-   * @param {object} params
    * @throws {PryvDataStoreError} with id `item-already-exists`
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
    * @returns {Promise<Event|EventDeletionItem>} - The trashed Event
    */
-  async delete (userId, eventId, params) { throw errors.unsupportedOperation('events.delete'); }
+  async delete (userId, eventId) { throw errors.unsupportedOperation('events.delete'); }
 };
 
 // limit tampering on existing properties
