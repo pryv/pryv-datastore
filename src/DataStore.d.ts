@@ -66,10 +66,4 @@ declare const events: UserEvents;
  * @param {identifier} userId
  */
 declare function deleteUser(userId: string): Promise<never>;
-/**
- * Return the total amount of storage used by the given user, in bytes.
- * @param {identifier} userId
- * @returns {Promise<number>}
- */
-declare function getUserStorageSize(userId: string): Promise<number>;
 export {};
