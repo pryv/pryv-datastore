@@ -7,10 +7,10 @@
   "license": "BSD-3-Clause",
   "author": "Pryv S.A. <info@pryv.com> (https://pryv.com)",
   "main": "src/index.js",
+  "types": "src/index.d.ts",
   "dependencies": {
     "jsdoc-to-markdown": "^8.0.0"
   },
-  "types": "src/index.d.ts",
   "devDependencies": {
     "@types/express": "^4.17.17",
     "@types/mocha": "^10.0.1",

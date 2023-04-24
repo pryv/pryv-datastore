@@ -6,6 +6,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-describe('Dummy', function () {
-
-});
+module.exports = {
+  getStoreQueryFromParams
+};
