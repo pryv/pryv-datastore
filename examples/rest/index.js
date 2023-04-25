@@ -174,12 +174,31 @@ function createRestUserEvents (rs) {
       return streamEvent;
     },
 
+    async getDeletionsStreamed (userId, query, options) {
+      const streamEvent = new StreamEvents();
+      superagent.post(rs.url(userId) + '/eventsGETDeletionsStreamed')
+        .set(rs.headers(userId))
+        .set('accept', 'json')
+        .send({ query, options })
+        .pipe(streamEvent);
+      return streamEvent;
+    },
+
+    async getHistory (userId, eventId) {
+      const res = await superagent.get(rs.url(userId) + '/events/' + eventId + '/history')
+        .set(rs.headers(userId))
+        .set('accept', 'json');
+      const events = res.body;
+      ds.defaults.applyOnEvents(events);
+      return events;
+    },
+
     async getOne (userId, eventId) {
       const res = await superagent.get(rs.url(userId) + '/events/' + eventId)
         .set(rs.headers(userId))
         .set('accept', 'json');
       const event = res.body;
-      ds.defaults.applyOnEvents([event]);
+      ds.defaults.applyOnEvent(event);
       return event;
     },
 
@@ -202,14 +221,16 @@ function createRestUserEvents (rs) {
       ds.defaults.applyOnEvents([event]);
       return event;
     },
-    async delete (userId, eventId, params) {
-      const res = await superagent.delete(rs.url(userId) + '/events/' + eventId)
-        .set(rs.headers(userId))
-        .set('accept', 'json')
-        .query(params);
-      const event = res.body;
-      ds.defaults.applyOnEvents([event]);
-      return event;
+    async delete (userId, originalEvent) {
+      const eventDeletion = await rs.post(userId, '/eventsDELETE/' + originalEvent.id, originalEvent);
+      ds.defaults.applyOnEvent(eventDeletion);
+      return eventDeletion;
+    },
+
+    // not to be implemented
+    async removeAllNonAccountEventsForUser (userId) {
+      await superagent.get(rs.url(userId) + '/removeAllNonAccountEventsForUser/')
+        .set(rs.headers(userId));
     }
   });
 }
@@ -233,6 +254,7 @@ class StreamEvents extends Transform {
       const eventStr = this.buffer.substring(0, n);
       this.buffer = this.buffer.substring(n + 1);
       const event = JSON.parse(eventStr);
+      ds.defaults.applyOnEvent(event);
       this.push(event);
       this.count++;
     }

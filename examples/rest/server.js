@@ -103,8 +103,35 @@ async function serve (ds, port, options) {
     });
   });
 
+  router.post('/:userId/eventsGETDeletionsStreamed', async (req, res, next) => {
+    const eventsStream = await ds.events.getEventsDeletionsStreamed(req.params.userId, req.body.query || {}, req.body.options || {});
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Transfer-Encoding', 'chunked');
+
+    let buffer = '';
+    const MAX_BUFF_SIZE = 1024;
+
+    eventsStream.on('data', function (event) {
+      buffer += JSON.stringify(event) + '\n';
+      if (buffer.length > MAX_BUFF_SIZE) {
+        res.write(buffer);
+        buffer = '';
+      }
+    });
+
+    eventsStream.on('end', function () {
+      res.write(buffer);
+      res.end();
+    });
+  });
+
   router.get('/:userId/events/:eventId', async (req, res, next) => {
     const event = await ds.events.getOne(req.params.userId, req.params.eventId);
+    res.json(event);
+  });
+
+  router.get('/:userId/events/:eventId/history', async (req, res, next) => {
+    const event = await ds.events.getHistory(req.params.userId, req.params.eventId);
     res.json(event);
   });
 
@@ -118,9 +145,14 @@ async function serve (ds, port, options) {
     res.json(event);
   });
 
-  router.delete('/:userId/events/:eventId', async (req, res, next) => {
-    const deleted = await ds.events.delete(req.params.userId, req.params.eventId);
+  router.post('/:userId/eventsDELETE/:eventId', async (req, res, next) => {
+    const deleted = await ds.events.delete(req.params.userId, req.body);
     res.json(deleted);
+  });
+
+  router.get('/:userId/removeAllNonAccountEventsForUser', async (req, res, next) => {
+    const result = await ds.events.removeAllNonAccountEventsForUser(req.params.userId);
+    res.json(result);
   });
 
   app.use(options.prefix || '/', router);
