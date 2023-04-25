@@ -45,6 +45,7 @@ Object.freeze(defaults);
  * @param {Object} event
  */
 function applyOnEvent (event) {
+  if (event == null) return null;
   if (typeof event.created === 'undefined') { event.created = defaults.UnknownDate; }
   if (typeof event.modified === 'undefined') { event.modified = defaults.UnknownDate; }
   if (typeof event.createdBy === 'undefined') { event.createdBy = defaults.UnknownAccessId; }
@@ -56,6 +57,7 @@ function applyOnEvent (event) {
  * @param {Object[]} events
  */
 function applyOnEvents (events) {
+  if (events == null) return null;
   events.forEach(applyOnEvent);
 }
 
@@ -66,6 +68,7 @@ function applyOnEvents (events) {
  * @param {string} [parentId]  - for parentId of the stream
  */
 function applyOnStream (stream, parentId = null) {
+  if (stream == null) return null;
   if (typeof stream.created === 'undefined') { stream.created = defaults.UnknownDate; }
   if (typeof stream.modified === 'undefined') { stream.modified = defaults.UnknownDate; }
   if (typeof stream.createdBy === 'undefined') { stream.createdBy = defaults.UnknownAccessId; }
@@ -82,5 +85,6 @@ function applyOnStream (stream, parentId = null) {
  * @param {string} [parentId]  - for parentId of the stream
  */
 function applyOnStreams (streams, parentId = null) {
+  if (streams == null) return null;
   streams.forEach(stream => applyOnStream(stream, parentId));
 }

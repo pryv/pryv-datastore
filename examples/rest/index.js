@@ -5,7 +5,7 @@
  * under the terms of the 3-Clause BSD License
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const Readable = require('stream').Readable;
+const Transform = require('stream').Transform;
 
 const ds = require('../../src'); // datastore
 const superagent = require('superagent');
@@ -14,27 +14,29 @@ const superagent = require('superagent');
  * Pass-through store that forwards all calls to an API
  * expected settings
  * @property {settings} Object
- * @property {settings.baseUrl} string - an url with {userId} to be replaced
+ * @property {settings.baseURL} string - an url with {userId} to be replaced
  * @property {settings.baseHeaders} [Object] - an object representing headers to be sent
  */
 module.exports = ds.createDataStore({
 
-  async init () {
+  async init (params) {
+    this.settings = params.settings;
     this.streams = createRestUserStreams(this);
     this.events = createRestUserEvents(this);
+
     try {
       if (!this.settings.baseURL) throw new Error('Null settings.baseURL parameter');
       if (this.settings.baseURL.indexOf('{userId}') < 0) throw new Error('Missing {userId} in settings.baseURL parameter');
       // eslint-disable-next-line no-new
-      new URL(this.settings.baseURL); // will throw error if Invalid URL
+      new URL(this.url('dummyuser')); // will throw error if Invalid URL
     } catch (err) {
-      throw ds.errors.invalidRequestStructure('Missing or invalid baseUrl setting', this.settings.baseUrl, err);
+      throw ds.errors.invalidRequestStructure('Missing or invalid baseURL setting: ' + this.settings.baseURL + ' >' + err.message);
     }
     return this;
   },
 
   url (userId) {
-    return this.settings.baseUrl.replace('{userId}', userId);
+    return this.settings.baseURL.replace('{userId}', userId);
   },
 
   headers (userId) {
@@ -51,6 +53,28 @@ module.exports = ds.createDataStore({
 
   async getUserStorageSize (userId) { // eslint-disable-line no-unused-vars
     return 0;
+  },
+
+  /**
+   * Wrapper for superagent
+   * POST content to server
+   * @param {string} userId
+   * @param {string} path
+   * @param {Object} content
+   * @return {Object} - result
+   */
+  async post (userId, path, content) {
+    try {
+      const res = await superagent
+        .post(this.url(userId) + path)
+        .set(this.headers(userId))
+        .set('accept', 'json')
+        .send(content);
+      return res.body;
+    } catch (e) {
+      $$(e);
+      throw(e);
+    }
   }
 });
 
@@ -58,23 +82,22 @@ module.exports = ds.createDataStore({
 
 function createRestUserStreams (rs) {
   return ds.createUserStreams({
-    async get (userId, params) {
-      const streams = await superagent
-        .get(rs.url(userId) + '/streams')
-        .set(rs.headers)
-        .set('accept', 'json')
-        .query(params);
+    async getOne (userId, query, options) {
+      const stream = await rs.post(userId, '/streamGET', { query, options });
+      ds.defaults.applyOnStream(stream);
+      return stream;
+    },
+
+    async get (userId, query, options) {
+      const streams = await rs.post(userId, '/streamsGET', { query, options });
       ds.defaults.applyOnStreams(streams);
       return streams;
     },
 
     async create (userId, streamData) {
-      const result = await superagent
-        .post(rs.url(userId) + '/streams')
-        .set(rs.headers)
-        .set('accept', 'json')
-        .send(streamData);
-      return result;
+      const stream = await rs.post(userId, '/streams', streamData);
+      ds.defaults.applyOnStream(stream);
+      return stream;
     },
 
     async update (userId, streamData) {
@@ -82,92 +105,86 @@ function createRestUserStreams (rs) {
       delete updateData.id;
       const result = await superagent
         .put(rs.url(userId) + '/streams/' + encodeURIComponent(streamData.id))
-        .set(rs.headers)
+        .set(rs.headers(userId))
         .set('accept', 'json')
         .send(updateData);
-      return result;
+      return result.body;
     },
 
     async updateDelete (userId, streamId) {
       const result = await superagent
         .delete(rs.url(userId) + '/streams/' + encodeURIComponent(streamId))
-        .set(rs.headers)
+        .set(rs.headers(userId))
         .set('accept', 'json')
         .send({ deleted: Date.now() / 1000 });
-      return result;
+      return result.body;
     },
 
     async deleteAll (userId) {
       const result = await superagent
         .delete(rs.url(userId) + '/streams')
-        .set(rs.headers)
+        .set(rs.headers(userId))
         .set('accept', 'json');
-      return result;
+      return result.body;
     },
 
     async getDeletions (userId, deletionsSince) {
       const deletions = await superagent
         .get(rs.url(userId) + '/streamsDeletions')
-        .set(rs.headers)
+        .set(rs.headers(userId))
         .set('accept', 'json')
         .query({ deletionsSince });
-      return deletions;
+      return deletions.body;
     },
 
     async createDeleted (userId, streamData) {
       const result = await superagent
         .post(rs.url(userId) + '/streamsDeletions')
-        .set(rs.headers)
+        .set(rs.headers(userId))
         .set('accept', 'json')
         .send(streamData);
-      return result;
+      return result.body;
     },
 
     async delete (userId, streamId) {
       const result = await superagent
         .delete(rs.url(userId) + '/streamsDeletions/' + encodeURIComponent(streamId))
-        .set(rs.headers)
+        .set(rs.headers(userId))
         .set('accept', 'json');
-      return result;
+      return result.body;
     }
   });
 }
 
 function createRestUserEvents (rs) {
   return ds.createUserEvents({
-    async get (userId, params) {
-      const events = await superagent.get(rs.url(userId))
-        .set(rs.headers(userId) + '/events')
-        .set('accept', 'json')
-        .query(params);
+    async get (userId, query, options) {
+      const events = await rs.post(userId, '/eventsGET', { query, options });
       ds.defaults.applyOnEvents(events);
       return events;
     },
 
-    async getStreamed (userId, params) {
-      const readable = new Readable({ objectMode: true, highWaterMark: 4000 });
-      superagent.get(rs.url(userId) + '/eventsStreamed')
+    async getStreamed (userId, query, options) {
+      const streamEvent = new StreamEvents();
+      superagent.post(rs.url(userId) + '/eventsGETStreamed')
         .set(rs.headers(userId))
         .set('accept', 'json')
-        .query(params)
-        .buffer(false)
-        .parse(myParser((event) => { readable.push(event); }));
-      return readable;
+        .send({ query, options })
+        .pipe(streamEvent);
+      return streamEvent;
     },
 
     async getOne (userId, eventId) {
-      const event = await superagent.get(rs.url(userId) + '/events/' + eventId)
+      const res = await superagent.get(rs.url(userId) + '/events/' + eventId)
         .set(rs.headers(userId))
         .set('accept', 'json');
+      const event = res.body;
       ds.defaults.applyOnEvents([event]);
       return event;
     },
 
     async create (userId, eventData) {
-      const event = await superagent.post(rs.url(userId) + '/events')
-        .set(rs.headers(userId))
-        .set('accept', 'json')
-        .send(eventData);
+      const event = await rs.post(userId, '/events', eventData);
       ds.defaults.applyOnEvents([event]);
       return event;
     },
@@ -177,45 +194,48 @@ function createRestUserEvents (rs) {
     // async deleteAttachedFile (userId, eventData, fileId) { throw errors.unsupportedOperation('events.deleteAttachedFile'); },
 
     async update (userId, eventData) {
-      const event = await superagent.put(rs.url(userId) + '/events')
+      const res = await superagent.put(rs.url(userId) + '/events')
         .set(rs.headers(userId))
         .set('accept', 'json')
         .send(eventData);
+      const event = res.body;
       ds.defaults.applyOnEvents([event]);
       return event;
     },
     async delete (userId, eventId, params) {
-      const event = await superagent.delete(rs.url(userId) + '/events/' + eventId)
+      const res = await superagent.delete(rs.url(userId) + '/events/' + eventId)
         .set(rs.headers(userId))
         .set('accept', 'json')
         .query(params);
+      const event = res.body;
       ds.defaults.applyOnEvents([event]);
       return event;
     }
   });
 }
 
-/**
- * Expects a result with one event per line
- */
-function myParser (foreachEvent) {
-  return function (res, fn) {
-    let buffer = ''; // temp data
+class StreamEvents extends Transform {
+  buffer;
+  count;
+  constructor () {
+    super({ readableObjectMode: true });
+    this.buffer = '';
+    this.count = 0;
+  }
 
-    res.setEncoding('utf8'); // Already UTF8 in browsers
-    res.on('data', chunk => {
-      buffer += chunk;
-      let n = 0;
-      while ((n = buffer.indexOf('\n')) > 0) {
-        const eventStr = buffer.substring(0, n);
-        buffer = buffer.substring(n + 1);
-        foreachEvent(JSON.stringify(eventStr));
-      }
-    });
-    res.on('end', () => {
-      const err = null;
-      foreachEvent(null);
-      fn(err, {});
-    });
-  };
+  /**
+   * @returns {void}
+   */
+  _transform (data, encoding, callback) {
+    this.buffer += data.toString('utf-8');
+    let n = 0;
+    while ((n = this.buffer.indexOf('\n')) > 0) {
+      const eventStr = this.buffer.substring(0, n);
+      this.buffer = this.buffer.substring(n + 1);
+      const event = JSON.parse(eventStr);
+      this.push(event);
+      this.count++;
+    }
+    callback();
+  }
 }

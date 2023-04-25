@@ -28,7 +28,7 @@ module.exports = ds.createDataStore({
       if (!this.settings.basePath) throw new Error('Null settings.basePath parameter');
       if (!fs.existsSync(this.settings.basePath)) throw new Error('Non existant path settings.basePath: ' + this.settings.basePath);
     } catch (err) {
-      throw ds.errors.invalidRequestStructure('Missing or invalid baseUrl setting', this.settings.basePath, err);
+      throw ds.errors.invalidRequestStructure('Missing or invalid baseURL setting', this.settings.basePath, err);
     }
     return this;
   },

@@ -27,57 +27,62 @@ async function serve (ds, port, options) {
 
   // ---------------------- streams ------------------ //
 
-  router.get('/:userId/streams', (req, res, next) => {
-    const streams = ds.streams.get(req.params.userId, req.query);
+  router.post('/:userId/streamGET', async (req, res, next) => {
+    const streams = await ds.streams.getOne(req.params.userId, req.body.query || {}, req.body.options || {});
     res.json(streams);
   });
 
-  router.post('/:userId/streams', (req, res, next) => {
-    const stream = ds.streams.create(req.params.userId, req.body);
+  router.post('/:userId/streamsGET', async (req, res, next) => {
+    const streams = await ds.streams.get(req.params.userId, req.body.query || {}, req.body.options || {});
+    res.json(streams);
+  });
+
+  router.post('/:userId/streams', async (req, res, next) => {
+    const stream = await ds.streams.create(req.params.userId, req.body);
     res.json(stream);
   });
 
-  router.put('/:userId/streams/:streamId', (req, res, next) => {
+  router.put('/:userId/streams/:streamId', async (req, res, next) => {
     const updateData = Object.assign({}, req.body);
     updateData.id = req.params.streamId;
-    const stream = ds.streams.update(req.params.userId, updateData);
+    const stream = await ds.streams.update(req.params.userId, updateData);
     res.json(stream);
   });
 
-  router.delete('/:userId/streams/:streamId', (req, res, next) => {
-    const result = ds.streams.updateDelete(req.params.userId, req.params.streamId);
+  router.delete('/:userId/streams/:streamId', async (req, res, next) => {
+    const result = await ds.streams.updateDelete(req.params.userId, req.params.streamId);
     res.json(result);
   });
 
-  router.delete('/:userId/streams', (req, res, next) => {
-    const result = ds.streams.deleteAll(req.params.userId);
+  router.delete('/:userId/streams', async (req, res, next) => {
+    const result = await ds.streams.deleteAll(req.params.userId);
     res.json(result);
   });
 
-  router.get('/:userId/streamsDeletions', (req, res, next) => {
-    const deletions = ds.streams.getDeletions(req.params.userId, req.query.deletionsSince);
+  router.get('/:userId/streamsDeletions', async (req, res, next) => {
+    const deletions = await ds.streams.getDeletions(req.params.userId, req.query.deletionsSince);
     res.json(deletions);
   });
 
-  router.post('/:userId/streamsDeletions', (req, res, next) => {
-    const deletions = ds.streams.createDeleted(req.params.userId, req.body);
+  router.post('/:userId/streamsDeletions', async (req, res, next) => {
+    const deletions = await ds.streams.createDeleted(req.params.userId, req.body);
     res.json(deletions);
   });
 
-  router.delete('/:userId/streamsDeletions/:streamId', (req, res, next) => {
-    const result = ds.streams.delete(req.params.userId, req.params.streamId);
+  router.delete('/:userId/streamsDeletions/:streamId', async (req, res, next) => {
+    const result = await ds.streams.delete(req.params.userId, req.params.streamId);
     res.json(result);
   });
 
   // ---------------------- events ------------------ //
 
-  router.get('/:userId/events', (req, res, next) => {
-    const events = ds.events.get(req.params.userId, req.query);
+  router.post('/:userId/eventsGET', async (req, res, next) => {
+    const events = await ds.events.get(req.params.userId, req.body.query || {}, req.body.options || {});
     res.json(events);
   });
 
-  router.get('/:userId/eventsStreamed', (req, res, next) => {
-    const eventsStream = ds.events.getStreamed(req.params.userId, req.query);
+  router.post('/:userId/eventsGETStreamed', async (req, res, next) => {
+    const eventsStream = await ds.events.getStreamed(req.params.userId, req.body.query || {}, req.body.options || {});
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Transfer-Encoding', 'chunked');
 
@@ -98,23 +103,23 @@ async function serve (ds, port, options) {
     });
   });
 
-  router.get('/:userId/events/:eventId', (req, res, next) => {
-    const event = ds.events.getOne(req.params.userId, req.params.eventId);
+  router.get('/:userId/events/:eventId', async (req, res, next) => {
+    const event = await ds.events.getOne(req.params.userId, req.params.eventId);
     res.json(event);
   });
 
-  router.post('/:userId/events', (req, res, next) => {
-    const event = ds.events.create(req.params.userId, req.body);
+  router.post('/:userId/events', async (req, res, next) => {
+    const event = await ds.events.create(req.params.userId, req.body);
     res.json(event);
   });
 
-  router.put('/:userId/events', (req, res, next) => {
-    const event = ds.events.update(req.params.userId, req.body);
+  router.put('/:userId/events', async (req, res, next) => {
+    const event = await ds.events.update(req.params.userId, req.body);
     res.json(event);
   });
 
-  router.delete('/:userId/events/:eventId', (req, res, next) => {
-    const deleted = ds.events.delete(req.params.userId, req.params.eventId);
+  router.delete('/:userId/events/:eventId', async (req, res, next) => {
+    const deleted = await ds.events.delete(req.params.userId, req.params.eventId);
     res.json(deleted);
   });
 
