@@ -5,7 +5,7 @@
  * under the terms of the 3-Clause BSD License
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const Transform = require('stream').Transform;
+const { PassThrough, Transform } = require('stream');
 
 const ds = require('../../src'); // datastore
 const superagent = require('superagent');
@@ -40,7 +40,8 @@ module.exports = ds.createDataStore({
   },
 
   headers (userId) {
-    return this.settings.baseHeaders || {};
+    const headers = Object.assign({ accept: 'json' }, this.settings.baseHeaders || {});
+    return headers;
   },
 
   async deleteUser (userId) { // eslint-disable-line no-unused-vars
@@ -55,6 +56,11 @@ module.exports = ds.createDataStore({
     return 0;
   },
 
+  apiError (e) {
+    $$(e);
+    throw e;
+  },
+
   /**
    * Wrapper for superagent
    * POST content to server
@@ -65,16 +71,51 @@ module.exports = ds.createDataStore({
    */
   async post (userId, path, content) {
     try {
-      const res = await superagent
-        .post(this.url(userId) + path)
-        .set(this.headers(userId))
-        .set('accept', 'json')
-        .send(content);
+      const res = await superagent.post(this.url(userId) + path).set(this.headers(userId)).send(content);
       return res.body;
-    } catch (e) {
-      $$(e);
-      throw(e);
-    }
+    } catch (e) { this.apiError(e); }
+  },
+
+  postAndPipe (userId, path, content, writeableStream) {
+    superagent.post(this.url(userId) + path).set(this.headers(userId)).send(content).pipe(writeableStream);
+  },
+
+  async postDataStream (userId, path, readableStream) {
+    return new Promise((resolve, reject) => {
+      const request = superagent.post(this.url(userId) + path).set(this.headers(userId));
+      readableStream.pipe(request);
+      request.on('error', (e) => { reject(e); });
+      request.on('end', () => {
+        const result = request.res?.text;
+        $$(result);
+        resolve(result);
+      });
+    });
+  },
+
+  async get (userId, path, query = {}) {
+    try {
+      const res = await superagent.get(this.url(userId) + path).set(this.headers(userId)).query(query);
+      return res.body;
+    } catch (e) { this.apiError(e); }
+  },
+
+  getAndPipe (userId, path, query, writeableStream) {
+    superagent.get(this.url(userId) + path).set(this.headers(userId)).query(query).pipe(writeableStream);
+  },
+
+  async put (userId, path, content) {
+    try {
+      const res = await superagent.put(this.url(userId) + path).set(this.headers(userId)).send(content);
+      return res.body;
+    } catch (e) { this.apiError(e); }
+  },
+
+  async delete (userId, path, query) {
+    try {
+      const res = await superagent.delete(this.url(userId) + path).set(this.headers(userId)).query(query);
+      return res.body;
+    } catch (e) { this.apiError(e); }
   }
 });
 
@@ -103,55 +144,28 @@ function createRestUserStreams (rs) {
     async update (userId, streamData) {
       const updateData = Object.assign({}, streamData);
       delete updateData.id;
-      const result = await superagent
-        .put(rs.url(userId) + '/streams/' + encodeURIComponent(streamData.id))
-        .set(rs.headers(userId))
-        .set('accept', 'json')
-        .send(updateData);
-      return result.body;
-    },
-
-    async updateDelete (userId, streamId) {
-      const result = await superagent
-        .delete(rs.url(userId) + '/streams/' + encodeURIComponent(streamId))
-        .set(rs.headers(userId))
-        .set('accept', 'json')
-        .send({ deleted: Date.now() / 1000 });
-      return result.body;
+      const stream = await rs.put(userId, '/streams/' + encodeURIComponent(streamData.id), updateData);
+      return stream;
     },
 
     async deleteAll (userId) {
-      const result = await superagent
-        .delete(rs.url(userId) + '/streams')
-        .set(rs.headers(userId))
-        .set('accept', 'json');
-      return result.body;
+      const result = await rs.delete(userId, '/streams');
+      return result;
     },
 
     async getDeletions (userId, deletionsSince) {
-      const deletions = await superagent
-        .get(rs.url(userId) + '/streamsDeletions')
-        .set(rs.headers(userId))
-        .set('accept', 'json')
-        .query({ deletionsSince });
-      return deletions.body;
+      const deletions = await rs.get(userId, '/streamsDeletions', { deletionsSince });
+      return deletions;
     },
 
     async createDeleted (userId, streamData) {
-      const result = await superagent
-        .post(rs.url(userId) + '/streamsDeletions')
-        .set(rs.headers(userId))
-        .set('accept', 'json')
-        .send(streamData);
+      const result = await rs.post(userId, '/streamsDeletions', streamData);
       return result.body;
     },
 
     async delete (userId, streamId) {
-      const result = await superagent
-        .delete(rs.url(userId) + '/streamsDeletions/' + encodeURIComponent(streamId))
-        .set(rs.headers(userId))
-        .set('accept', 'json');
-      return result.body;
+      const result = await rs.delete(userId, '/streamsDeletions/' + encodeURIComponent(streamId));
+      return result;
     }
   });
 }
@@ -165,39 +179,25 @@ function createRestUserEvents (rs) {
     },
 
     async getStreamed (userId, query, options) {
-      const streamEvent = new StreamEvents();
-      superagent.post(rs.url(userId) + '/eventsGETStreamed')
-        .set(rs.headers(userId))
-        .set('accept', 'json')
-        .send({ query, options })
-        .pipe(streamEvent);
-      return streamEvent;
+      const streamedEvents = new JSONStreamedItems();
+      rs.postAndPipe(userId, '/eventsGETStreamed', { query, options }, streamedEvents)
+      return streamedEvents;
     },
 
     async getDeletionsStreamed (userId, query, options) {
-      const streamEvent = new StreamEvents();
-      superagent.post(rs.url(userId) + '/eventsGETDeletionsStreamed')
-        .set(rs.headers(userId))
-        .set('accept', 'json')
-        .send({ query, options })
-        .pipe(streamEvent);
-      return streamEvent;
+      const streamedEvents = new JSONStreamedItems();
+      rs.postAndPipe(userId, '/eventsGETDeletionsStreamed', { query, options }, streamedEvents)
+      return streamedEvents;
     },
 
     async getHistory (userId, eventId) {
-      const res = await superagent.get(rs.url(userId) + '/events/' + eventId + '/history')
-        .set(rs.headers(userId))
-        .set('accept', 'json');
-      const events = res.body;
+      const events = await rs.get(userId, '/events/' + eventId + '/history');
       ds.defaults.applyOnEvents(events);
       return events;
     },
 
     async getOne (userId, eventId) {
-      const res = await superagent.get(rs.url(userId) + '/events/' + eventId)
-        .set(rs.headers(userId))
-        .set('accept', 'json');
-      const event = res.body;
+      const event = await rs.get(userId, '/events/' + eventId);
       ds.defaults.applyOnEvent(event);
       return event;
     },
@@ -208,17 +208,46 @@ function createRestUserEvents (rs) {
       return event;
     },
 
-    // async saveAttachedFiles (userId, partialEventData, attachmentsItems) { throw errors.unsupportedOperation('events.saveAttachedFiles'); },
-    // async getAttachedFile (userId, eventData, fileId) { throw errors.unsupportedOperation('events.getAttachedFile'); },
-    // async deleteAttachedFile (userId, eventData, fileId) { throw errors.unsupportedOperation('events.deleteAttachedFile'); },
+    /**
+     * @param {string} userId
+     * @param {Array<AttachmentItem>} attachmentsItems
+     * @param {Transaction} transaction
+     * @returns {Promise<any[]>}
+     */
+    async saveAttachedFiles (userId, eventId, attachmentsItems, transaction) {
+      const attachmentsResponse = [];
+      for (const attachment of attachmentsItems) {
+        const fileId = await rs.postDataStream(userId, '/events/' + eventId + '/attachment', attachment.attachmentData);
+        $$(fileId);
+        attachmentsResponse.push({ id: fileId });
+      }
+      return attachmentsResponse;
+    },
+
+    /**
+     * @param {string} userId
+     * @param {string} fileId
+     * @returns {Promise<any>}
+     */
+    async getAttachedFile (userId, eventId, fileId) {
+      const readableStream = new PassThrough();
+      rs.getAndPipe(userId, '/events/' + eventId + '/attachments/' + fileId, {}, readableStream);
+      return readableStream;
+    },
+
+    /**
+     * @param {string} userId
+     * @param {string} fileId
+     * @param {Transaction} transaction
+     * @returns {Promise<any>}
+     */
+    async deleteAttachedFile (userId, eventId, fileId, transaction) {
+      return await rs.delete(userId, '/events/' + eventId + '/attachments/' + fileId);
+    },
 
     async update (userId, eventData) {
-      const res = await superagent.put(rs.url(userId) + '/events')
-        .set(rs.headers(userId))
-        .set('accept', 'json')
-        .send(eventData);
-      const event = res.body;
-      ds.defaults.applyOnEvents([event]);
+      const event = await rs.put(userId, '/events', eventData);
+      ds.defaults.applyOnEvent(event);
       return event;
     },
     async delete (userId, originalEvent) {
@@ -229,13 +258,12 @@ function createRestUserEvents (rs) {
 
     // not to be implemented
     async removeAllNonAccountEventsForUser (userId) {
-      await superagent.get(rs.url(userId) + '/removeAllNonAccountEventsForUser/')
-        .set(rs.headers(userId));
+      return await rs.get(userId, '/removeAllNonAccountEventsForUser/');
     }
   });
 }
 
-class StreamEvents extends Transform {
+class JSONStreamedItems extends Transform {
   buffer;
   count;
   constructor () {

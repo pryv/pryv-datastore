@@ -6,6 +6,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 const express = require('express');
+const { PassThrough } = require('stream');
 
 module.exports = serve;
 
@@ -83,46 +84,12 @@ async function serve (ds, port, options) {
 
   router.post('/:userId/eventsGETStreamed', async (req, res, next) => {
     const eventsStream = await ds.events.getStreamed(req.params.userId, req.body.query || {}, req.body.options || {});
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Transfer-Encoding', 'chunked');
-
-    let buffer = '';
-    const MAX_BUFF_SIZE = 1024;
-
-    eventsStream.on('data', function (event) {
-      buffer += JSON.stringify(event) + '\n';
-      if (buffer.length > MAX_BUFF_SIZE) {
-        res.write(buffer);
-        buffer = '';
-      }
-    });
-
-    eventsStream.on('end', function () {
-      res.write(buffer);
-      res.end();
-    });
+    streamJSONwOneItemPerLine(eventsStream, res);
   });
 
   router.post('/:userId/eventsGETDeletionsStreamed', async (req, res, next) => {
-    const eventsStream = await ds.events.getEventsDeletionsStreamed(req.params.userId, req.body.query || {}, req.body.options || {});
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Transfer-Encoding', 'chunked');
-
-    let buffer = '';
-    const MAX_BUFF_SIZE = 1024;
-
-    eventsStream.on('data', function (event) {
-      buffer += JSON.stringify(event) + '\n';
-      if (buffer.length > MAX_BUFF_SIZE) {
-        res.write(buffer);
-        buffer = '';
-      }
-    });
-
-    eventsStream.on('end', function () {
-      res.write(buffer);
-      res.end();
-    });
+    const eventsStream = await ds.events.getDeletionsStreamed(req.params.userId, req.body.query || {}, req.body.options || {});
+    streamJSONwOneItemPerLine(eventsStream, res);
   });
 
   router.get('/:userId/events/:eventId', async (req, res, next) => {
@@ -131,8 +98,8 @@ async function serve (ds, port, options) {
   });
 
   router.get('/:userId/events/:eventId/history', async (req, res, next) => {
-    const event = await ds.events.getHistory(req.params.userId, req.params.eventId);
-    res.json(event);
+    const events = await ds.events.getHistory(req.params.userId, req.params.eventId);
+    res.json(events);
   });
 
   router.post('/:userId/events', async (req, res, next) => {
@@ -155,7 +122,56 @@ async function serve (ds, port, options) {
     res.json(result);
   });
 
+  router.post('/:userId/eventsDELETE/:eventId', async (req, res, next) => {
+    const deleted = await ds.events.delete(req.params.userId, req.body);
+    res.json(deleted);
+  });
+
+  router.post('/:userId/events/:eventId/attachment/', async (req, res, next) => {
+    const readableStream = new PassThrough();
+    req.pipe(readableStream);
+    const fakeAttachemntItems = [{ attachmentData: readableStream }];
+    const fileIds = await ds.events.saveAttachedFiles(req.params.userId, req.params.eventId, fakeAttachemntItems);
+    const result = fileIds[0]?.id;
+    res.json(result);
+  });
+
+  router.get('/:userId/events/:eventId/attachments/:fileId', async (req, res, next) => {
+    const readableData = await ds.events.getAttachedFile(req.params.userId, req.params.eventId, req.params.fileId);
+  });
+
+  router.delete('/:userId/events/:eventId/attachments/:fileId', async (req, res, next) => {
+    const deleted = await ds.events.deleteAttachedFile(req.params.userId, req.params.eventId, req.params.fileId);
+    res.json(deleted);
+  });
+
   app.use(options.prefix || '/', router);
   app.listen(port);
   return app;
+}
+
+/**
+   * Read an object stream source and send them with one item per line,
+   * @param {ReadableStream} readableSource
+   * @param {Response} res
+   */
+function streamJSONwOneItemPerLine(readableSource, res) {
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Transfer-Encoding', 'chunked');
+
+  let buffer = '';
+  const MAX_BUFF_SIZE = 1024;
+
+  readableSource.on('data', function (event) {
+    buffer += JSON.stringify(event) + '\n';
+    if (buffer.length > MAX_BUFF_SIZE) {
+      res.write(buffer);
+      buffer = '';
+    }
+  });
+
+  readableSource.on('end', function () {
+    res.write(buffer);
+    res.end();
+  });
 }
