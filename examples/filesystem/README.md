@@ -1,6 +1,8 @@
-# Pryv Datastore Module to map a filesystem
+# Pryv datastore module example: mapping a filesystem
+
+*In development*
 
 
-# License
+## License
 
 [BSD-3-Clause](LICENSE)
