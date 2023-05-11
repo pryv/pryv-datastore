@@ -25,6 +25,21 @@ const errors = require('./errors');
  */
 
 /**
+ * @typedef {object} EventsQuery
+ * @property {string} [state] The events' state: `default` (i.e. not trashed), `trashed` or `all`
+ * @property {timestamp} [fromTime] The start time of the timeframe to retrieve events for. Default is 24 hours before `toTime` if the latter is set; otherwise it is not taken into account.
+ * @property {timestamp} [toTime] The end time of the timeframe to retrieve events for. Default is the current time if fromTime is set.
+ * @property {StreamQueryItem[]} [streams] Streams query: an array of stream query items (see related documentation).
+ * @property {string[]} [types] If set, only events of any of the listed types will be returned.
+ * @property {boolean} [running] If `true`, only running period events will be returned.
+ * @property {timestamp} [modifiedSince] If specified, only events modified since that time will be returned.
+ */
+
+/**
+ * @typedef {object} StreamQueryItem
+ */
+
+/**
  * @typedef {object} EventDeletionItem
  */
 
@@ -61,7 +76,7 @@ const UserEvents = module.exports = {
   /**
    * Get events for this user.
    * @param {identifier} userId
-   * @param {GetEventQuery} query Event query
+   * @param {EventsQuery} query Event query
    * @param {{skip, limit, sort}} options
    * @returns {Promise<Event[]>}
    */
@@ -70,7 +85,7 @@ const UserEvents = module.exports = {
   /**
    * Get events as a stream for this user.
    * @param {identifier} userId
-   * @param {GetEventQuery} query Event query
+   * @param {EventsQuery} query Event query
    * @param {{skip, limit, sort}} options
    * @returns {Promise<ReadableStream<Event>>}
    */

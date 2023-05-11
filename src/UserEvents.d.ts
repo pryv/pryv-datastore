@@ -2,6 +2,37 @@ export type identifier = string;
 export type timestamp = number;
 export type integrity = string;
 export type Event = object;
+export type EventsQuery = {
+    /**
+     * The events' state: `default` (i.e. not trashed), `trashed` or `all`
+     */
+    state?: string;
+    /**
+     * The start time of the timeframe to retrieve events for. Default is 24 hours before `toTime` if the latter is set; otherwise it is not taken into account.
+     */
+    fromTime?: timestamp;
+    /**
+     * The end time of the timeframe to retrieve events for. Default is the current time if fromTime is set.
+     */
+    toTime?: timestamp;
+    /**
+     * Streams query: an array of stream query items (see related documentation).
+     */
+    streams?: StreamQueryItem[];
+    /**
+     * If set, only events of any of the listed types will be returned.
+     */
+    types?: string[];
+    /**
+     * If `true`, only running period events will be returned.
+     */
+    running?: boolean;
+    /**
+     * If specified, only events modified since that time will be returned.
+     */
+    modifiedSince?: timestamp;
+};
+export type StreamQueryItem = object;
 export type EventDeletionItem = object;
 /**
  * Object to pass when creating events with attachments or adding attachments to events
@@ -25,47 +56,55 @@ export type AttachmentItem = {
  * Informations sent by the store after saving attachment
  */
 export type AttachmentResponseItem = object;
-
 /**
  * @param {identifier} userId
  * @param {identifier} eventId
  * @return {Promise<Event|null>}
  */
-export declare function getOne(userId: string, eventId: string): Promise<Event|null>;
-
+export declare function getOne(userId: string, eventId: string): Promise<any>;
 /**
  * Get events for this user.
  * @param {identifier} userId
- * @param {GetEventQuery} query Event query
+ * @param {EventsQuery} query Event query
  * @param {{skip, limit, sort}} options
  * @returns {Promise<Event[]>}
  */
-export declare function get(userId: string, query: GetEventQuery, options: GetEventOptions): Promise<Events[]>;
+export declare function get(userId: string, query: EventsQuery, options: {
+    skip: any;
+    limit: any;
+    sort: any;
+}): Promise<any[]>;
 /**
  * Get events as a stream for this user.
  * @param {identifier} userId
- * @param {GetEventQuery} query Event query
+ * @param {EventsQuery} query Event query
  * @param {{skip, limit, sort}} options
  * @returns {Promise<ReadableStream<Event>>}
  */
-export declare function getStreamed(userId: string, query: GetEventQuery, options: GetEventOptions): Promise<ReadableStream<Event>>;
-
+export declare function getStreamed(userId: string, query: EventsQuery, options: {
+    skip: any;
+    limit: any;
+    sort: any;
+}): Promise<ReadableStream<any>>;
 /**
  * @param {identifier} userId
  * @param {{deletedSince: timestamp}} query
  * @param {{skip: number, limit: number, sortAscending: boolean}} [options]
  * @returns {Promise<ReadableStream<EventDeletionItem>>}
  */
-export declare function  getDeletionsStreamed (userId:string, query: {deletedSince: timestamp} , options: {skip: number, limit: number, sortAscending: boolean}): Promise<ReadableStream<EventDeletionItem>>;
-
+export declare function getDeletionsStreamed(userId: string, query: {
+    deletedSince: number;
+}, options?: {
+    skip: number;
+    limit: number;
+    sortAscending: boolean;
+}): Promise<ReadableStream<any>>;
 /**
- * Get history of this event
  * @param {identifier} userId
  * @param {identifier} eventId
  * @returns {Promise<Event[]>}
  */
-export declare function getHistory(userId: string, eventsId: string): Promise<Events[]>
-
+export declare function getHistory(userId: string, eventId: string): Promise<any[]>;
 /**
  * @see [Create events in Pryv.io API reference](https://api.pryv.com/reference/#create-event)
  * @param {identifier} userId
@@ -75,7 +114,7 @@ export declare function getHistory(userId: string, eventsId: string): Promise<Ev
  * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
  * @returns {Promise<Event>} - The created event
  */
-export declare function create(userId: string, eventData: any): Promise<Event>;
+export declare function create(userId: string, eventData: any): Promise<any>;
 /**
  * @param {identifier} userId
  * @param {identifier} eventId
@@ -85,29 +124,29 @@ export declare function create(userId: string, eventData: any): Promise<Event>;
  * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
  * @returns {Promise<AttachmentResponseItem>} - The ids and other information related to the attachments
  */
-export declare function saveAttachedFiles(userId: string, eventId: string, attachmentsItems: AttachmentItem[]): Promise<AttachmentResponseItem>;
+export declare function saveAttachedFiles(userId: string, eventId: string, attachmentsItems: AttachmentItem[]): Promise<any>;
 /**
  * Retrieve the specified file as a stream.
  * @param {identifier} userId
- * @param {object} eventData
+ * @param {identifier} eventId
  * @param {identifier} fileId
  * @returns {Promise<ReadableStream>}
  */
-export declare function getAttachedFile(userId: string, eventData: any, fileId: string): Promise<ReadableStream<any>>;
+export declare function getAttachedFile(userId: string, eventId: string, fileId: string): Promise<ReadableStream<any>>;
 /**
  * Delete the specified file.
  * @param {identifier} userId
- * @param {any} eventData
+ * @param {identifier} eventId
  * @param {identifier} fileId
  * @throws {PryvDataStoreError} with id `invalid-item-id`
  * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
  * @returns {Promise<AttachmentResponseItem>} - The ids and other information related to the attachments
  */
-export declare function deleteAttachedFile(userId: string, eventData: any, fileId: string): Promise<AttachmentResponseItem>;
+export declare function deleteAttachedFile(userId: string, eventId: string, fileId: string): Promise<any>;
 /**
  * Fully replace an event with new Data
  * @param {identifier} userId
- * @param {any} eventData - New event data
+ * @param {Event} eventData - New event data
  * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
  * @returns {Promise<boolean>} - true if an event was updated
  */
