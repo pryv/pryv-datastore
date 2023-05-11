@@ -35,7 +35,7 @@ const DataStore = module.exports = {
    * Called when the given user is deleted from Pryv.io, to let the store delete the related data if appropriate.
    * @param {identifier} userId
    */
-  async deleteUser (userId) { throw new Error('Not implemented'); }, // eslint-disable-line no-unused-vars
+  async deleteUser (userId) { throw new Error('Not implemented'); } // eslint-disable-line no-unused-vars
 };
 
 // limit tampering on existing properties

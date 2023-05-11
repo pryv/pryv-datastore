@@ -180,13 +180,13 @@ function createRestUserEvents (rs) {
 
     async getStreamed (userId, query, options) {
       const streamedEvents = new JSONStreamedItems();
-      rs.postAndPipe(userId, '/eventsGETStreamed', { query, options }, streamedEvents)
+      rs.postAndPipe(userId, '/eventsGETStreamed', { query, options }, streamedEvents);
       return streamedEvents;
     },
 
     async getDeletionsStreamed (userId, query, options) {
       const streamedEvents = new JSONStreamedItems();
-      rs.postAndPipe(userId, '/eventsGETDeletionsStreamed', { query, options }, streamedEvents)
+      rs.postAndPipe(userId, '/eventsGETDeletionsStreamed', { query, options }, streamedEvents);
       return streamedEvents;
     },
 

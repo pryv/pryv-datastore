@@ -155,7 +155,7 @@ async function serve (ds, port, options) {
    * @param {ReadableStream} readableSource
    * @param {Response} res
    */
-function streamJSONwOneItemPerLine(readableSource, res) {
+function streamJSONwOneItemPerLine (readableSource, res) {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Transfer-Encoding', 'chunked');
 
