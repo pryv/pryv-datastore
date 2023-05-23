@@ -35,9 +35,8 @@ const errors = require('./errors');
 const UserStreams = module.exports = {
   /* eslint-disable no-unused-vars */
 
-
   /**
-   * Get a stream 
+   * Get a stream
    * @param {identifier} userId
    * @param {object} query
    * @param {identifier} query.id '*', means root streamId. Notice parentId is not implemented by stores
@@ -49,10 +48,10 @@ const UserStreams = module.exports = {
   async getOne (userId, streamId, query) { throw errors.unsupportedOperation('streams.get'); },
 
   /**
-   * Query streams 
+   * Query streams
    * @param {identifier} userId
    * @param {object} query
-   * @param {identifier} [query.parentId] '*' or `null`, means root streamId. 
+   * @param {identifier} [query.parentId] '*' or `null`, means root streamId.
    * @param {number} [query.childrenDepth=0] 0 = NO; -1 = ALL; 1.. Gives the number of levels to expand
    * @param {identifier[]} [query.excludeIds] list of streamIds to exclude from query. if childrenDepth is >0 or < 0, children of excludedIds should be excludded too
    * @param {boolean} [query.includeTrashed] (equivalent to state = 'all')
@@ -91,7 +90,7 @@ const UserStreams = module.exports = {
   /**
    * @see https://api.pryv.com/reference/#update-stream
    * @param {identifier} userId
-   * @param {Object} updateData  
+   * @param {Object} updateData
    * @throws item-already-exists
    * @throws resource-is-readonly <=== Thrown because item cannot be updated
    * @returns {Promise<Stream>} - The update Stream

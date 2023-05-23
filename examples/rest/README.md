@@ -1,11 +1,8 @@
-# REST DATASTORE MODULE
+# Pryv datastore module example: accessing a remote REST service
 
-*In developpment*
-
-Pass-through store that forwards all calls to an API
+*In development*
 
 
-
-# License
+## License
 
 [BSD-3-Clause](LICENSE)

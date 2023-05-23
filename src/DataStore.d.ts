@@ -7,31 +7,50 @@ export type identifier = string;
  */
 export type timestamp = number;
 export type UserStreams = {
-    get(userId: string, params: {
-        id?: string;
+    getOne(userId: string, streamId: any, query: {
+        id: string;
         childrenDepth?: number;
         excludeIds?: string[];
         includeTrashed?: boolean;
     }): Promise<any>;
-    getDeletions(userId: string, deletionsSince: number): Promise<never>;
-    create(userId: string, params: any): Promise<any>;
-    update(userId: string, streamId: any, params: any): Promise<any>;
-    delete(userId: string, streamId: string, params: any): Promise<any>;
+    get(userId: string, query: {
+        parentId?: string;
+        childrenDepth?: number;
+        excludeIds?: string[];
+        includeTrashed?: boolean;
+    }): Promise<any[]>;
+    getDeletions(userId: string, deletionsSince: number): Promise<import("./UserStreams").StreamDeletionItem>;
+    create(userId: string, streamData: any): Promise<any>;
+    createDeleted(userId: string, streamData: any): Promise<any>;
+    update(userId: string, updateData: any): Promise<any>;
+    delete(userId: string, streamId: string): Promise<any>;
 };
 export type UserEvents = {
-    get(userId: string, params: {
-        withDeletions?: boolean;
-        deletedSince?: number;
-        includeHistory?: boolean;
+    getOne(userId: string, eventId: string): Promise<any>;
+    get(userId: string, query: import("./UserEvents").EventsQuery, options: {
+        skip: any;
+        limit: any;
+        sort: any;
     }): Promise<any[]>;
-    getStreamed(userId: string, params: any): Promise<ReadableStream<any>>;
-    getOne(userId: string, eventId: string): Promise<never>;
+    getStreamed(userId: string, query: import("./UserEvents").EventsQuery, options: {
+        skip: any;
+        limit: any;
+        sort: any;
+    }): Promise<ReadableStream<any>>;
+    getDeletionsStreamed(userId: string, query: {
+        deletedSince: number;
+    }, options?: {
+        skip: number;
+        limit: number;
+        sortAscending: boolean;
+    }): Promise<ReadableStream<any>>;
+    getHistory(userId: string, eventId: string): Promise<any[]>;
     create(userId: string, eventData: any): Promise<any>;
-    saveAttachedFiles(userId: string, partialEventData: any, attachmentsItems: import("./UserEvents").AttachmentItem[]): Promise<any>;
-    getAttachedFile(userId: string, eventData: any, fileId: string): Promise<ReadableStream<any>>;
-    deleteAttachedFile(userId: string, eventData: any, fileId: string): Promise<any>;
+    saveAttachedFiles(userId: string, eventId: string, attachmentsItems: import("./UserEvents").AttachmentItem[]): Promise<any>;
+    getAttachedFile(userId: string, eventId: string, fileId: string): Promise<ReadableStream<any>>;
+    deleteAttachedFile(userId: string, eventId: string, fileId: string): Promise<any>;
     update(userId: string, eventData: any): Promise<boolean>;
-    delete(userId: string, eventId: string, params: any): Promise<any>;
+    delete(userId: string, eventId: string): Promise<any>;
 };
 export type FnKeyValueGetAll = (userId: identifier) => object;
 export type FnKeyValueGet = (userId: identifier, key: string) => any;
@@ -50,15 +69,53 @@ export type KeyValueData = {
      */
     set: FnKeyValueSet;
 };
-declare const id: string;
-declare const name: string;
-declare const settings: object;
+export type StoreInitializationParams = {
+    /**
+     * The store's id as defined in the Pryv.io platform configuration (for information)
+     */
+    id: identifier;
+    /**
+     * The store's name as defined in the Pryv.io platform configuration (for information; names the root stream representing the store)
+     */
+    name: string;
+    /**
+     * The store's settings as defined in the Pryv.io platform configuration
+     */
+    settings: object;
+    /**
+     * Utility to save per-user data
+     */
+    storeKeyValueData: KeyValueData;
+    /**
+     * Logger for the store (messages will appear in the Pryv.io core logs)
+     */
+    logger: Logger;
+};
+export type FnLog = (message: string, ...context?: any[]) => any;
+export type Logger = {
+    /**
+     * Log message with 'info' level
+     */
+    log: FnLog;
+    /**
+     * Log message with 'warning' level
+     */
+    warn: FnLog;
+    /**
+     * Log message with 'error' level
+     */
+    error: FnLog;
+    /**
+     * Log message with 'debug' level
+     */
+    debug: FnLog;
+};
 /**
  * Initialize the store.
- * @param {KeyValueData} keyValueData A store-specific key-value database for user data (e.g. credentials or settings).
+ * @param {StoreInitializationParams} params
  * @returns {Promise<DataStore>} The data store object itself (for method chaining).
  */
-declare function init(keyValueData: KeyValueData): Promise<any>;
+declare function init(params: StoreInitializationParams): Promise<any>;
 declare const streams: UserStreams;
 declare const events: UserEvents;
 /**

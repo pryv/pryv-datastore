@@ -1,4 +1,5 @@
 import DataStore = require("./DataStore");
+import UserStreams = require("./UserStreams");
 import UserEvents = require("./UserEvents");
 import defaults = require("./defaults");
 import errors = require("./errors");
@@ -8,39 +9,54 @@ import errors = require("./errors");
  * @returns {DataStore}
  */
 export declare function createDataStore(implementation: any): {
-    readonly id: string;
-    readonly name: string;
-    readonly settings: any;
-    init(keyValueData: DataStore.KeyValueData): Promise<any>;
+    init(params: DataStore.StoreInitializationParams): Promise<any>;
     streams: {
-        get(userId: string, params: {
-            id?: string;
+        getOne(userId: string, streamId: any, query: {
+            id: string;
             childrenDepth?: number;
             excludeIds?: string[];
             includeTrashed?: boolean;
         }): Promise<any>;
-        getDeletions(userId: string, deletionsSince: number): Promise<never>;
-        create(userId: string, params: any): Promise<any>;
-        update(userId: string, streamId: any, params: any): Promise<any>;
-        delete(userId: string, streamId: string, params: any): Promise<any>;
+        get(userId: string, query: {
+            parentId?: string;
+            childrenDepth?: number;
+            excludeIds?: string[];
+            includeTrashed?: boolean;
+        }): Promise<any[]>;
+        getDeletions(userId: string, deletionsSince: number): Promise<UserStreams.StreamDeletionItem>;
+        create(userId: string, streamData: any): Promise<any>;
+        createDeleted(userId: string, streamData: any): Promise<any>;
+        update(userId: string, updateData: any): Promise<any>;
+        delete(userId: string, streamId: string): Promise<any>;
     };
     events: {
-        get(userId: string, params: {
-            withDeletions?: boolean;
-            deletedSince?: number;
-            includeHistory?: boolean;
+        getOne(userId: string, eventId: string): Promise<any>;
+        get(userId: string, query: UserEvents.EventsQuery, options: {
+            skip: any;
+            limit: any;
+            sort: any;
         }): Promise<any[]>;
-        getStreamed(userId: string, params: any): Promise<ReadableStream<any>>;
-        getOne(userId: string, eventId: string): Promise<never>;
+        getStreamed(userId: string, query: UserEvents.EventsQuery, options: {
+            skip: any;
+            limit: any;
+            sort: any;
+        }): Promise<ReadableStream<any>>;
+        getDeletionsStreamed(userId: string, query: {
+            deletedSince: number;
+        }, options?: {
+            skip: number;
+            limit: number;
+            sortAscending: boolean;
+        }): Promise<ReadableStream<any>>;
+        getHistory(userId: string, eventId: string): Promise<any[]>;
         create(userId: string, eventData: any): Promise<any>;
-        saveAttachedFiles(userId: string, partialEventData: any, attachmentsItems: UserEvents.AttachmentItem[]): Promise<any>;
-        getAttachedFile(userId: string, eventData: any, fileId: string): Promise<ReadableStream<any>>;
-        deleteAttachedFile(userId: string, eventData: any, fileId: string): Promise<any>;
+        saveAttachedFiles(userId: string, eventId: string, attachmentsItems: UserEvents.AttachmentItem[]): Promise<any>;
+        getAttachedFile(userId: string, eventId: string, fileId: string): Promise<ReadableStream<any>>;
+        deleteAttachedFile(userId: string, eventId: string, fileId: string): Promise<any>;
         update(userId: string, eventData: any): Promise<boolean>;
-        delete(userId: string, eventId: string, params: any): Promise<any>;
+        delete(userId: string, eventId: string): Promise<any>;
     };
     deleteUser(userId: string): Promise<never>;
-    getUserStorageSize(userId: string): Promise<number>;
 };
 /**
  * Create a new user streams object with the given implementation.
@@ -48,16 +64,23 @@ export declare function createDataStore(implementation: any): {
  * @returns {UserStreams}
  */
 export declare function createUserStreams(implementation: any): {
-    get(userId: string, params: {
-        id?: string;
+    getOne(userId: string, streamId: any, query: {
+        id: string;
         childrenDepth?: number;
         excludeIds?: string[];
         includeTrashed?: boolean;
     }): Promise<any>;
-    getDeletions(userId: string, deletionsSince: number): Promise<never>;
-    create(userId: string, params: any): Promise<any>;
-    update(userId: string, streamId: any, params: any): Promise<any>;
-    delete(userId: string, streamId: string, params: any): Promise<any>;
+    get(userId: string, query: {
+        parentId?: string;
+        childrenDepth?: number;
+        excludeIds?: string[];
+        includeTrashed?: boolean;
+    }): Promise<any[]>;
+    getDeletions(userId: string, deletionsSince: number): Promise<UserStreams.StreamDeletionItem>;
+    create(userId: string, streamData: any): Promise<any>;
+    createDeleted(userId: string, streamData: any): Promise<any>;
+    update(userId: string, updateData: any): Promise<any>;
+    delete(userId: string, streamId: string): Promise<any>;
 };
 /**
  * Create a new user events object with the given implementation.
@@ -65,18 +88,30 @@ export declare function createUserStreams(implementation: any): {
  * @returns {UserEvents}
  */
 export declare function createUserEvents(implementation: any): {
-    get(userId: string, params: {
-        withDeletions?: boolean;
-        deletedSince?: number;
-        includeHistory?: boolean;
+    getOne(userId: string, eventId: string): Promise<any>;
+    get(userId: string, query: UserEvents.EventsQuery, options: {
+        skip: any;
+        limit: any;
+        sort: any;
     }): Promise<any[]>;
-    getStreamed(userId: string, params: any): Promise<ReadableStream<any>>;
-    getOne(userId: string, eventId: string): Promise<never>;
+    getStreamed(userId: string, query: UserEvents.EventsQuery, options: {
+        skip: any;
+        limit: any;
+        sort: any;
+    }): Promise<ReadableStream<any>>;
+    getDeletionsStreamed(userId: string, query: {
+        deletedSince: number;
+    }, options?: {
+        skip: number;
+        limit: number;
+        sortAscending: boolean;
+    }): Promise<ReadableStream<any>>;
+    getHistory(userId: string, eventId: string): Promise<any[]>;
     create(userId: string, eventData: any): Promise<any>;
-    saveAttachedFiles(userId: string, partialEventData: any, attachmentsItems: UserEvents.AttachmentItem[]): Promise<any>;
-    getAttachedFile(userId: string, eventData: any, fileId: string): Promise<ReadableStream<any>>;
-    deleteAttachedFile(userId: string, eventData: any, fileId: string): Promise<any>;
+    saveAttachedFiles(userId: string, eventId: string, attachmentsItems: UserEvents.AttachmentItem[]): Promise<any>;
+    getAttachedFile(userId: string, eventId: string, fileId: string): Promise<ReadableStream<any>>;
+    deleteAttachedFile(userId: string, eventId: string, fileId: string): Promise<any>;
     update(userId: string, eventData: any): Promise<boolean>;
-    delete(userId: string, eventId: string, params: any): Promise<any>;
+    delete(userId: string, eventId: string): Promise<any>;
 };
 export { defaults, errors };
