@@ -13,7 +13,7 @@ const ErrorIds = require('./ErrorIds');
  * Helper "factory" methods for data store errors (see error ids).
  * @exports errors
  */
-module.exports = {
+const factory = {
   /**
    * @param {string} message
    * @param {*} data
@@ -76,3 +76,29 @@ module.exports = {
     return new PryvDataStoreError(ErrorIds.UnsupportedOperation, message, data, innerError);
   }
 };
+
+/**
+ * @param {Error} error
+ */
+factory.toJSON = function toJSON (error) {
+  // @ts-ignore
+  const dsError = error.id != null ? error : factory.unexpectedError('', null, error);
+  const holder = {
+    id: dsError.id,
+    message: dsError.message,
+    data: dsError.data,
+    // innerError: investigate how we could serialize innerError 
+  };
+  return JSON.stringify(holder);
+};
+
+/**
+ * @param {string} jsonString
+ * @returns {PryvDataStoreError}
+ */
+factory.fromJSON = function fromJSON (jsonString) {
+  const holder = JSON.parse(jsonString);
+  return new PryvDataStoreError(holder.id, holder.message, holder.data);
+};
+
+module.exports = factory;

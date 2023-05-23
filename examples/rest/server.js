@@ -7,6 +7,7 @@
  */
 const express = require('express');
 const { PassThrough } = require('stream');
+const errors = require('../../src/errors');
 
 module.exports = serve;
 
@@ -103,8 +104,13 @@ async function serve (ds, port, options) {
   });
 
   router.post('/:userId/events', async (req, res, next) => {
-    const event = await ds.events.create(req.params.userId, req.body);
-    res.json(event);
+    try {
+      const event = await ds.events.create(req.params.userId, req.body);
+      res.json(event);
+    } catch (e) {
+      res.status(400);
+      res.json(errors.toJSON(e));
+    }
   });
 
   router.put('/:userId/events', async (req, res, next) => {
@@ -138,6 +144,7 @@ async function serve (ds, port, options) {
 
   router.get('/:userId/events/:eventId/attachments/:fileId', async (req, res, next) => {
     const readableData = await ds.events.getAttachedFile(req.params.userId, req.params.eventId, req.params.fileId);
+    readableData.pipe(res);
   });
 
   router.delete('/:userId/events/:eventId/attachments/:fileId', async (req, res, next) => {

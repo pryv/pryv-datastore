@@ -30,7 +30,7 @@ module.exports = ds.createDataStore({
       // eslint-disable-next-line no-new
       new URL(this.url('dummyuser')); // will throw error if Invalid URL
     } catch (err) {
-      throw ds.errors.invalidRequestStructure('Missing or invalid baseURL setting: ' + this.settings.baseURL + ' >' + err.message);
+      throw ds.errors.invalidRequestStructure('Missing or invalid baseURL setting: ' + this.settings.baseURL + ' >' + err.message, this.settings, err);
     }
     return this;
   },
@@ -44,11 +44,11 @@ module.exports = ds.createDataStore({
     return headers;
   },
 
-  async deleteUser (userId) { // eslint-disable-line no-unused-vars
+  async deleteUser (userId) {
     try {
       await superagent.delete(this.url(userId)).set(this.headers(userId));
     } catch (err) {
-
+      // should we do something here ?
     }
   },
 
@@ -56,8 +56,14 @@ module.exports = ds.createDataStore({
     return 0;
   },
 
+  // handle error here
   apiError (e) {
-    $$(e);
+    if ((e instanceof Error) && e.response?.body) {
+      const body = e.response?.body;
+      const dsError = ds.errors.fromJSON(body);
+      throw dsError;
+    }
+
     throw e;
   },
 
@@ -67,7 +73,7 @@ module.exports = ds.createDataStore({
    * @param {string} userId
    * @param {string} path
    * @param {Object} content
-   * @return {Object} - result
+   * @return {Promise<any>} - result
    */
   async post (userId, path, content) {
     try {
@@ -86,9 +92,13 @@ module.exports = ds.createDataStore({
       readableStream.pipe(request);
       request.on('error', (e) => { reject(e); });
       request.on('end', () => {
-        const result = request.res?.text;
-        $$(result);
-        resolve(result);
+        try {
+          // @ts-ignore
+          const result = JSON.parse(request.res?.text);
+          resolve(result);
+        } catch (e) {
+          reject(e);
+        }
       });
     });
   },
@@ -180,13 +190,13 @@ function createRestUserEvents (rs) {
 
     async getStreamed (userId, query, options) {
       const streamedEvents = new JSONStreamedItems();
-      rs.postAndPipe(userId, '/eventsGETStreamed', { query, options }, streamedEvents)
+      rs.postAndPipe(userId, '/eventsGETStreamed', { query, options }, streamedEvents);
       return streamedEvents;
     },
 
     async getDeletionsStreamed (userId, query, options) {
       const streamedEvents = new JSONStreamedItems();
-      rs.postAndPipe(userId, '/eventsGETDeletionsStreamed', { query, options }, streamedEvents)
+      rs.postAndPipe(userId, '/eventsGETDeletionsStreamed', { query, options }, streamedEvents);
       return streamedEvents;
     },
 
@@ -218,7 +228,6 @@ function createRestUserEvents (rs) {
       const attachmentsResponse = [];
       for (const attachment of attachmentsItems) {
         const fileId = await rs.postDataStream(userId, '/events/' + eventId + '/attachment', attachment.attachmentData);
-        $$(fileId);
         attachmentsResponse.push({ id: fileId });
       }
       return attachmentsResponse;
