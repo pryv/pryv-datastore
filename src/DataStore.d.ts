@@ -91,7 +91,7 @@ export type StoreInitializationParams = {
      */
     logger: Logger;
 };
-export type FnLog = (message: string, ...context?: any[]) => any;
+export type FnLog = (message: string, ...context: any[]) => any;
 export type Logger = {
     /**
      * Log message with 'info' level

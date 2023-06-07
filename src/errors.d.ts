@@ -41,3 +41,12 @@ export function invalidItemId(message: string, data: any, innerError: Error): Pr
  * @returns {PryvDataStoreError}
  */
 export function unsupportedOperation(message: string, data?: any, innerError?: Error): PryvDataStoreError;
+/**
+ * @param {any} error
+ */
+export function toJSON(error: any): string;
+/**
+ * @param {string} jsonString
+ * @returns {PryvDataStoreError}
+ */
+export function fromJSON(jsonString: string): PryvDataStoreError;

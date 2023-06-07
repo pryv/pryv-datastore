@@ -94,7 +94,7 @@ for (const propName of Object.getOwnPropertyNames(DataStore)) {
 /**
  * @callback FnLog
  * @param {string} message The log message
- * @param {...any} [context] Any additional contextual information
+ * @param {...any} context Any additional contextual information
  */
 
 /**

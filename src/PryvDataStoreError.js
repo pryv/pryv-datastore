@@ -23,3 +23,4 @@ function PryvDataStoreError (id, message, data = null, innerError = null) {
 }
 
 PryvDataStoreError.prototype = Object.create(Error.prototype);
+PryvDataStoreError.prototype.name = 'PryvDataStoreError';

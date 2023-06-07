@@ -19,15 +19,5 @@ declare class PryvDataStoreError {
     id: string;
     data: any;
     innerError: Error;
-    message: string;
-
-    /**
-     * @returns {string}
-     */
-    toJSON();
-    /**
-     * @param jsonStr 
-     * @returns {PryvDataStoreError}
-     */
-    static fromJSON(jsonStr: string);
+    name: string;
 }
