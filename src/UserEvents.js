@@ -122,15 +122,16 @@ const UserEvents = module.exports = {
   async create (userId, eventData) { throw errors.unsupportedOperation('events.create'); },
 
   /**
+   * Add the given file to the event.
    * @param {identifier} userId
    * @param {identifier} eventId
-   * @param {AttachmentItem[]} attachmentsItems - Array of attachments informations.
+   * @param {AttachmentItem} attachmentItem - The file's information and data
    * @throws {PryvDataStoreError} with id `item-already-exists`
    * @throws {PryvDataStoreError} with id `invalid-item-id`
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
-   * @returns {Promise<AttachmentResponseItem>} - The ids and other information related to the attachments
+   * @returns {Promise<Event>} - The updated event
    */
-  async saveAttachedFiles (userId, eventId, attachmentsItems) { throw errors.unsupportedOperation('events.saveAttachedFiles'); },
+  async addAttachment (userId, eventId, attachmentItem) { throw errors.unsupportedOperation('events.saveAttachedFiles'); },
 
   /**
    * Retrieve the specified file as a stream.
@@ -150,10 +151,10 @@ const UserEvents = module.exports = {
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
    * @returns {Promise<AttachmentResponseItem>} - The ids and other information related to the attachments
    */
-  async deleteAttachedFile (userId, eventId, fileId) { throw errors.unsupportedOperation('events.deleteAttachedFile'); },
+  async deleteAttachment (userId, eventId, fileId) { throw errors.unsupportedOperation('events.deleteAttachedFile'); },
 
   /**
-   * Fully replace an event with new Data
+   * Update the specified event with new data (the given event data replaces the original data).
    * @param {identifier} userId
    * @param {Event} eventData - New event data
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only

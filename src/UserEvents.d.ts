@@ -116,15 +116,16 @@ export declare function getHistory(userId: string, eventId: string): Promise<any
  */
 export declare function create(userId: string, eventData: any): Promise<any>;
 /**
+ * Add the given file to the event.
  * @param {identifier} userId
  * @param {identifier} eventId
- * @param {AttachmentItem[]} attachmentsItems - Array of attachments informations.
+ * @param {AttachmentItem} attachmentItem - The file's information and data
  * @throws {PryvDataStoreError} with id `item-already-exists`
  * @throws {PryvDataStoreError} with id `invalid-item-id`
  * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
- * @returns {Promise<AttachmentResponseItem>} - The ids and other information related to the attachments
+ * @returns {Promise<Event>} - The updated event
  */
-export declare function saveAttachedFiles(userId: string, eventId: string, attachmentsItems: AttachmentItem[]): Promise<any>;
+export declare function addAttachment(userId: string, eventId: string, attachmentItem: AttachmentItem): Promise<any>;
 /**
  * Retrieve the specified file as a stream.
  * @param {identifier} userId
@@ -142,9 +143,9 @@ export declare function getAttachedFile(userId: string, eventId: string, fileId:
  * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
  * @returns {Promise<AttachmentResponseItem>} - The ids and other information related to the attachments
  */
-export declare function deleteAttachedFile(userId: string, eventId: string, fileId: string): Promise<any>;
+export declare function deleteAttachment(userId: string, eventId: string, fileId: string): Promise<any>;
 /**
- * Fully replace an event with new Data
+ * Update the specified event with new data (the given event data replaces the original data).
  * @param {identifier} userId
  * @param {Event} eventData - New event data
  * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
