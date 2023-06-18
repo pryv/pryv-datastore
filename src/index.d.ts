@@ -51,7 +51,7 @@ export declare function createDataStore(implementation: any): {
         getHistory(userId: string, eventId: string): Promise<any[]>;
         create(userId: string, eventData: any): Promise<any>;
         addAttachment(userId: string, eventId: string, attachmentItem: UserEvents.AttachmentItem): Promise<any>;
-        getAttachedFile(userId: string, eventId: string, fileId: string): Promise<ReadableStream<any>>;
+        getAttachment(userId: string, eventId: string, fileId: string): Promise<ReadableStream<any>>;
         deleteAttachment(userId: string, eventId: string, fileId: string): Promise<any>;
         update(userId: string, eventData: any): Promise<boolean>;
         delete(userId: string, eventId: string): Promise<any>;
@@ -109,7 +109,7 @@ export declare function createUserEvents(implementation: any): {
     getHistory(userId: string, eventId: string): Promise<any[]>;
     create(userId: string, eventData: any): Promise<any>;
     addAttachment(userId: string, eventId: string, attachmentItem: UserEvents.AttachmentItem): Promise<any>;
-    getAttachedFile(userId: string, eventId: string, fileId: string): Promise<ReadableStream<any>>;
+    getAttachment(userId: string, eventId: string, fileId: string): Promise<ReadableStream<any>>;
     deleteAttachment(userId: string, eventId: string, fileId: string): Promise<any>;
     update(userId: string, eventData: any): Promise<boolean>;
     delete(userId: string, eventId: string): Promise<any>;

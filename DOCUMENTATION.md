@@ -402,7 +402,7 @@ Prototype object for per-user events data.
     * [.getHistory(userId, eventId)](#module_UserEvents.getHistory) ⇒ <code>Promise.&lt;Array.&lt;Event&gt;&gt;</code>
     * [.create(userId, eventData)](#module_UserEvents.create) ⇒ [<code>Promise.&lt;Event&gt;</code>](#Event)
     * [.saveAttachedFiles(userId, eventId, attachmentsItems)](#module_UserEvents.saveAttachedFiles) ⇒ [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem)
-    * [.getAttachedFile(userId, eventId, fileId)](#module_UserEvents.getAttachedFile) ⇒ <code>Promise.&lt;ReadableStream&gt;</code>
+    * [.getAttachment(userId, eventId, fileId)](#module_UserEvents.getAttachment) ⇒ <code>Promise.&lt;ReadableStream&gt;</code>
     * [.deleteAttachedFile(userId, eventId, fileId)](#module_UserEvents.deleteAttachedFile) ⇒ [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem)
     * [.update(userId, eventData)](#module_UserEvents.update) ⇒ <code>Promise.&lt;boolean&gt;</code>
     * [.delete(userId, eventId)](#module_UserEvents.delete) ⇒ <code>Promise.&lt;(Event\|EventDeletionItem)&gt;</code>
@@ -500,9 +500,9 @@ Get events as a stream for this user.
 | eventId | [<code>identifier</code>](#identifier) |  |
 | attachmentsItems | [<code>Array.&lt;AttachmentItem&gt;</code>](#AttachmentItem) | Array of attachments informations. |
 
-<a name="module_UserEvents.getAttachedFile"></a>
+<a name="module_UserEvents.getAttachment"></a>
 
-### UserEvents.getAttachedFile(userId, eventId, fileId) ⇒ <code>Promise.&lt;ReadableStream&gt;</code>
+### UserEvents.getAttachment(userId, eventId, fileId) ⇒ <code>Promise.&lt;ReadableStream&gt;</code>
 Retrieve the specified file as a stream.
 
 **Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  

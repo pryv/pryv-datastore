@@ -133,7 +133,7 @@ export declare function addAttachment(userId: string, eventId: string, attachmen
  * @param {identifier} fileId
  * @returns {Promise<ReadableStream>}
  */
-export declare function getAttachedFile(userId: string, eventId: string, fileId: string): Promise<ReadableStream<any>>;
+export declare function getAttachment(userId: string, eventId: string, fileId: string): Promise<ReadableStream<any>>;
 /**
  * Delete the specified file.
  * @param {identifier} userId

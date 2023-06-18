@@ -134,21 +134,27 @@ async function serve (ds, port, options) {
   });
 
   router.post('/:userId/events/:eventId/attachment/', async (req, res, next) => {
+    const attachmentItem = {
+      fileName: req.query.fileName,
+      type: req.query.type,
+      size: parseInt(req.query.size),
+      integrity: req.query.integrity
+    };
+
     const readableStream = new PassThrough();
     req.pipe(readableStream);
-    const fakeAttachemntItems = [{ attachmentData: readableStream }];
-    const fileIds = await ds.events.saveAttachedFiles(req.params.userId, req.params.eventId, fakeAttachemntItems);
-    const result = fileIds[0]?.id;
-    res.json(result);
+    attachmentItem.attachmentData = readableStream;
+    const event = await ds.events.addAttachment(req.params.userId, req.params.eventId, attachmentItem);
+    res.json(event);
   });
 
   router.get('/:userId/events/:eventId/attachments/:fileId', async (req, res, next) => {
-    const readableData = await ds.events.getAttachedFile(req.params.userId, req.params.eventId, req.params.fileId);
+    const readableData = await ds.events.getAttachment(req.params.userId, req.params.eventId, req.params.fileId);
     readableData.pipe(res);
   });
 
   router.delete('/:userId/events/:eventId/attachments/:fileId', async (req, res, next) => {
-    const deleted = await ds.events.deleteAttachedFile(req.params.userId, req.params.eventId, req.params.fileId);
+    const deleted = await ds.events.deleteAttachment(req.params.userId, req.params.eventId, req.params.fileId);
     res.json(deleted);
   });
 

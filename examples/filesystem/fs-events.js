@@ -83,7 +83,7 @@ module.exports = function createFSUserEvents (fsds) {
     },
 
     // async saveAttachedFiles (userId, partialEventData, attachmentsItems) { throw errors.unsupportedOperation('events.saveAttachedFiles'); },
-    // async getAttachedFile (userId, eventData, fileId) { throw errors.unsupportedOperation('events.getAttachedFile'); },
+    // async getAttachment (userId, eventData, fileId) { throw errors.unsupportedOperation('events.getAttachment'); },
     // async deleteAttachedFile (userId, eventData, fileId) { throw errors.unsupportedOperation('events.deleteAttachedFile'); },
 
     async update (userId, eventData) {

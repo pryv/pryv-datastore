@@ -131,7 +131,7 @@ const UserEvents = module.exports = {
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
    * @returns {Promise<Event>} - The updated event
    */
-  async addAttachment (userId, eventId, attachmentItem) { throw errors.unsupportedOperation('events.saveAttachedFiles'); },
+  async addAttachment (userId, eventId, attachmentItem) { throw errors.unsupportedOperation('events.addAttachment'); },
 
   /**
    * Retrieve the specified file as a stream.
@@ -140,7 +140,7 @@ const UserEvents = module.exports = {
    * @param {identifier} fileId
    * @returns {Promise<ReadableStream>}
    */
-  async getAttachedFile (userId, eventId, fileId) { throw errors.unsupportedOperation('events.getAttachedFile'); },
+  async getAttachment (userId, eventId, fileId) { throw errors.unsupportedOperation('events.getAttachment'); },
 
   /**
    * Delete the specified file.
@@ -151,7 +151,7 @@ const UserEvents = module.exports = {
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
    * @returns {Promise<AttachmentResponseItem>} - The ids and other information related to the attachments
    */
-  async deleteAttachment (userId, eventId, fileId) { throw errors.unsupportedOperation('events.deleteAttachedFile'); },
+  async deleteAttachment (userId, eventId, fileId) { throw errors.unsupportedOperation('events.deleteAttachment'); },
 
   /**
    * Update the specified event with new data (the given event data replaces the original data).

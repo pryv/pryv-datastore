@@ -86,9 +86,9 @@ module.exports = ds.createDataStore({
     superagent.post(this.url(userId) + path).set(this.headers(userId)).send(content).pipe(writeableStream);
   },
 
-  async postDataStream (userId, path, readableStream) {
+  async postDataStream (userId, path, keyValue, readableStream) {
     return new Promise((resolve, reject) => {
-      const request = superagent.post(this.url(userId) + path).set(this.headers(userId));
+      const request = superagent.post(this.url(userId) + path).set(this.headers(userId)).query(keyValue);
       readableStream.pipe(request);
       request.on('error', (e) => { reject(e); });
       request.on('end', () => {
@@ -220,17 +220,19 @@ function createRestUserEvents (rs) {
 
     /**
      * @param {string} userId
-     * @param {Array<AttachmentItem>} attachmentsItems
+     * @param {AttachmentItem} attachmentItem
      * @param {Transaction} transaction
      * @returns {Promise<any[]>}
      */
-    async saveAttachedFiles (userId, eventId, attachmentsItems, transaction) {
-      const attachmentsResponse = [];
-      for (const attachment of attachmentsItems) {
-        const fileId = await rs.postDataStream(userId, '/events/' + eventId + '/attachment', attachment.attachmentData);
-        attachmentsResponse.push({ id: fileId });
-      }
-      return attachmentsResponse;
+    async addAttachment (userId, eventId, attachmentItem, transaction) {
+      const keyValue = {
+        fileName: attachmentItem.fileName,
+        type: attachmentItem.type,
+        size: attachmentItem.size,
+        integrity: attachmentItem.integrity
+      };
+      const newEvent = await rs.postDataStream(userId, '/events/' + eventId + '/attachment', keyValue, attachmentItem.attachmentData);
+      return newEvent;
     },
 
     /**
@@ -238,7 +240,7 @@ function createRestUserEvents (rs) {
      * @param {string} fileId
      * @returns {Promise<any>}
      */
-    async getAttachedFile (userId, eventId, fileId) {
+    async getAttachment (userId, eventId, fileId) {
       const readableStream = new PassThrough();
       rs.getAndPipe(userId, '/events/' + eventId + '/attachments/' + fileId, {}, readableStream);
       return readableStream;
@@ -250,7 +252,7 @@ function createRestUserEvents (rs) {
      * @param {Transaction} transaction
      * @returns {Promise<any>}
      */
-    async deleteAttachedFile (userId, eventId, fileId, transaction) {
+    async deleteAttachment (userId, eventId, fileId, transaction) {
       return await rs.delete(userId, '/events/' + eventId + '/attachments/' + fileId);
     },
 
