@@ -42,7 +42,7 @@ const factory = module.exports = {
    */
   unknownResource (resourceType, id, innerError) {
     const message = `Unknown ${resourceType || 'resource'} ${id ? `"${id}"` : ''}`;
-    return new PryvDataStoreError(ErrorIds.UnknownResource, message, null, innerError);
+    return new PryvDataStoreError(ErrorIds.UnknownResource, message, { resourceType, id }, innerError);
   },
 
   /**
@@ -53,7 +53,7 @@ const factory = module.exports = {
    */
   itemAlreadyExists (resourceType, conflictingKeys, innerError) {
     const message = `${resourceType || 'Resource'} already exists with conflicting key(s): ${JSON.stringify(conflictingKeys)}`;
-    return new PryvDataStoreError(ErrorIds.ItemAlreadyExists, message, { conflictingKeys }, innerError);
+    return new PryvDataStoreError(ErrorIds.ItemAlreadyExists, message, { resourceType, conflictingKeys }, innerError);
   },
 
   /**
@@ -74,30 +74,5 @@ const factory = module.exports = {
    */
   unsupportedOperation (message, data, innerError) {
     return new PryvDataStoreError(ErrorIds.UnsupportedOperation, message, data, innerError);
-  },
-
-  // Serialization methods
-
-  /**
-   * @param {any} error
-   */
-  toJSON (error) {
-    const dsError = error.id != null ? error : factory.unexpectedError('', null, error);
-    const holder = {
-      id: dsError.id,
-      message: dsError.message,
-      data: dsError.data
-      // innerError: investigate how we could serialize innerError
-    };
-    return JSON.stringify(holder);
-  },
-
-  /**
-   * @param {string} jsonString
-   * @returns {PryvDataStoreError}
-   */
-  fromJSON (jsonString) {
-    const holder = JSON.parse(jsonString);
-    return new PryvDataStoreError(holder.id, holder.message, holder.data);
   }
 };

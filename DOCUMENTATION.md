@@ -258,8 +258,6 @@ Helper "factory" methods for data store errors (see error ids).
     * [.itemAlreadyExists(resourceType, conflictingKeys, innerError)](#module_errors.itemAlreadyExists) ⇒ [<code>PryvDataStoreError</code>](#PryvDataStoreError)
     * [.invalidItemId(message, data, innerError)](#module_errors.invalidItemId) ⇒ [<code>PryvDataStoreError</code>](#PryvDataStoreError)
     * [.unsupportedOperation(message, [data], [innerError])](#module_errors.unsupportedOperation) ⇒ [<code>PryvDataStoreError</code>](#PryvDataStoreError)
-    * [.toJSON(error)](#module_errors.toJSON)
-    * [.fromJSON(jsonString)](#module_errors.fromJSON) ⇒ [<code>PryvDataStoreError</code>](#PryvDataStoreError)
 
 <a name="module_errors.unexpectedError"></a>
 
@@ -326,26 +324,6 @@ Helper "factory" methods for data store errors (see error ids).
 | message | <code>string</code> | 
 | [data] | <code>\*</code> | 
 | [innerError] | <code>Error</code> | 
-
-<a name="module_errors.toJSON"></a>
-
-### errors.toJSON(error)
-**Kind**: static method of [<code>errors</code>](#module_errors)  
-
-| Param | Type |
-| --- | --- |
-| error | <code>any</code> | 
-
-<a name="module_errors.fromJSON"></a>
-
-### errors.fromJSON(jsonString) ⇒ [<code>PryvDataStoreError</code>](#PryvDataStoreError)
-**Kind**: static method of [<code>errors</code>](#module_errors)  
-
-| Param | Type |
-| --- | --- |
-| jsonString | <code>string</code> | 
-
-<a name="module_datastore"></a>
 
 ## datastore
 

@@ -120,7 +120,7 @@ async function serve (ds, port, options) {
       res.json(event);
     } catch (e) {
       res.status(400);
-      res.json(errors.toJSON(e));
+      res.json(errorToJSON(e));
     }
   });
 
@@ -175,10 +175,10 @@ async function serve (ds, port, options) {
 }
 
 /**
-   * Read an object stream source and send them with one item per line,
-   * @param {ReadableStream} readableSource
-   * @param {Response} res
-   */
+ * Read an object stream source and send them with one item per line,
+ * @param {ReadableStream} readableSource
+ * @param {Response} res
+ */
 function streamJSONwOneItemPerLine (readableSource, res) {
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Transfer-Encoding', 'chunked');
@@ -198,4 +198,18 @@ function streamJSONwOneItemPerLine (readableSource, res) {
     res.write(buffer);
     res.end();
   });
+}
+
+/**
+ * @param {any} error
+ */
+function errorToJSON (error) {
+  const dsError = error.id != null ? error : errors.unexpectedError('', null, error);
+  const holder = {
+    id: dsError.id,
+    message: dsError.message,
+    data: dsError.data
+    // innerError: investigate how we could serialize innerError
+  };
+  return JSON.stringify(holder);
 }
