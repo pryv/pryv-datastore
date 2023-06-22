@@ -27,6 +27,17 @@ async function serve (ds, port, options) {
     router.use(options.middleware);
   }
 
+  // ---------------------- user ------------------- //
+  router.delete('/:userId', async (req, res) => {
+    await ds.deleteUser(req.params.userId);
+    res.json({ OK: true });
+  });
+
+  router.get('/:userId/storageSize', async (req, res) => {
+    const storageSize = await ds.getUserStorageSize (req.params.userId);
+    res.json({ storageSize });
+  });
+
   // ---------------------- streams ------------------ //
 
   router.post('/:userId/streamGET', async (req, res, next) => {

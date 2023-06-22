@@ -45,15 +45,12 @@ module.exports = ds.createDataStore({
   },
 
   async deleteUser (userId) {
-    try {
-      await superagent.delete(this.url(userId)).set(this.headers(userId));
-    } catch (err) {
-      // should we do something here ?
-    }
+    await this.delete(userId, '');
   },
 
   async getUserStorageSize (userId) { // eslint-disable-line no-unused-vars
-    return 0;
+    const result = await this.get(userId, '/storageSize');
+    return result.storageSize || 0;
   },
 
   // handle error here
