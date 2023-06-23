@@ -51,7 +51,7 @@ module.exports = ds.createDataStore({
 
   async getUserStorageSize (userId) { // eslint-disable-line no-unused-vars
     const result = await this.get(userId, '/storageSize');
-    return result.storageSize || 0;
+    return result || 0;
   },
 
   // handle error here
@@ -257,6 +257,7 @@ function createRestUserEvents (rs) {
     async update (userId, eventData) {
       const event = await rs.put(userId, '/events', eventData);
       ds.defaults.applyOnEvent(event);
+      //$$({userId, eventData, event});
       return event;
     },
     async delete (userId, originalEvent) {

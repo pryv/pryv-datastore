@@ -75,7 +75,7 @@ function applyOnStream (stream, parentId = null) {
   if (typeof stream.modifiedBy === 'undefined') { stream.modifiedBy = defaults.UnknownAccessId; }
   if (stream.children == null) { stream.children = []; }
   if (stream.children.length > 0) { applyOnStreams(stream.children, stream.id); }
-  stream.parentId = parentId;
+  stream.parentId = stream.parentId || parentId;
 }
 
 /**
