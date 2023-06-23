@@ -30,113 +30,95 @@ async function serve (ds, port, options) {
   // ---------------------- user ------------------- //
   router.delete('/:userId', aeh(async (req, res) => {
     await ds.deleteUser(req.params.userId);
-    res.json({ OK: true });
+    return { OK: true };
   }));
 
   router.get('/:userId/storageSize', aeh(async (req, res) => {
-    const storageSize = await ds.getUserStorageSize (req.params.userId);
-    res.json({ storageSize });
+    return await ds.getUserStorageSize (req.params.userId);
   }));
 
   // ---------------------- streams ------------------ //
 
   router.post('/:userId/streamGET', aeh(async (req, res) => {
-    const streams = await ds.streams.getOne(req.params.userId, req.body.query || {}, req.body.options || {});
-    res.json(streams);
+    return await ds.streams.getOne(req.params.userId, req.body.query || {}, req.body.options || {});
   }));
 
   router.post('/:userId/streamsGET', aeh(async (req, res) => {
-    const streams = await ds.streams.get(req.params.userId, req.body.query || {}, req.body.options || {});
-    res.json(streams);
+    return await ds.streams.get(req.params.userId, req.body.query || {}, req.body.options || {});
   }));
 
   router.post('/:userId/streams', aeh(async (req, res) => {
-    const stream = await ds.streams.create(req.params.userId, req.body);
-    res.json(stream);
+    return await ds.streams.create(req.params.userId, req.body);
   }));
 
   router.put('/:userId/streams/:streamId', aeh(async (req, res) => {
     const updateData = Object.assign({}, req.body);
     updateData.id = req.params.streamId;
-    const stream = await ds.streams.update(req.params.userId, updateData);
-    res.json(stream);
+    return await ds.streams.update(req.params.userId, updateData);
   }));
 
   router.delete('/:userId/streams/:streamId', aeh(async (req, res) => {
-    const result = await ds.streams.updateDelete(req.params.userId, req.params.streamId);
-    res.json(result);
+    return await ds.streams.updateDelete(req.params.userId, req.params.streamId);
   }));
 
   router.delete('/:userId/streams', aeh(async (req, res) => {
-    const result = await ds.streams.deleteAll(req.params.userId);
-    res.json(result);
+    return await ds.streams.deleteAll(req.params.userId);
   }));
 
   router.get('/:userId/streamsDeletions', aeh(async (req, res) => {
-    const deletions = await ds.streams.getDeletions(req.params.userId, req.query.deletionsSince);
-    res.json(deletions);
+    return await ds.streams.getDeletions(req.params.userId, req.query.deletionsSince);
   }));
 
   router.post('/:userId/streamsDeletions', aeh(async (req, res) => {
-    const deletions = await ds.streams.createDeleted(req.params.userId, req.body);
-    res.json(deletions);
+    return await ds.streams.createDeleted(req.params.userId, req.body);
   }));
 
   router.delete('/:userId/streamsDeletions/:streamId', aeh(async (req, res) => {
-    const result = await ds.streams.delete(req.params.userId, req.params.streamId);
-    res.json(result);
+    return await ds.streams.delete(req.params.userId, req.params.streamId);
   }));
 
   // ---------------------- events ------------------ //
 
   router.post('/:userId/eventsGET', aeh(async (req, res) => {
-    const events = await ds.events.get(req.params.userId, req.body.query || {}, req.body.options || {});
-    res.json(events);
+    return await ds.events.get(req.params.userId, req.body.query || {}, req.body.options || {});
   }));
 
   router.post('/:userId/eventsGETStreamed', aeh(async (req, res) => {
     const eventsStream = await ds.events.getStreamed(req.params.userId, req.body.query || {}, req.body.options || {});
     streamJSONwOneItemPerLine(eventsStream, res);
-  }));
+  }, false));
 
   router.post('/:userId/eventsGETDeletionsStreamed', aeh(async (req, res) => {
     const eventsStream = await ds.events.getDeletionsStreamed(req.params.userId, req.body.query || {}, req.body.options || {});
     streamJSONwOneItemPerLine(eventsStream, res);
-  }));
+  }, false));
 
   router.get('/:userId/events/:eventId', aeh(async (req, res) => {
-    const event = await ds.events.getOne(req.params.userId, req.params.eventId);
-    res.json(event);
+    return await ds.events.getOne(req.params.userId, req.params.eventId);
   }));
 
   router.get('/:userId/events/:eventId/history', aeh(async (req, res) => {
-    const events = await ds.events.getHistory(req.params.userId, req.params.eventId);
-    res.json(events);
+    return await ds.events.getHistory(req.params.userId, req.params.eventId);
   }));
 
   router.post('/:userId/events', aeh(async (req, res) => {
-    const event = await ds.events.create(req.params.userId, req.body);
-    res.json(event);
+    return await ds.events.create(req.params.userId, req.body);
   }));
 
   router.put('/:userId/events', aeh(async (req, res) => {
-    const event = await ds.events.update(req.params.userId, req.body);
-    res.json(event);
+    return await ds.events.update(req.params.userId, req.body);
   }));
 
   router.post('/:userId/eventsDELETE/:eventId', aeh(async (req, res) => {
-    const deleted = await ds.events.delete(req.params.userId, req.body);
-    res.json(deleted);
+    return await ds.events.delete(req.params.userId, req.body);
   }));
 
   router.get('/:userId/removeAllNonAccountEventsForUser', aeh(async (req, res) => {
-    const result = await ds.events.removeAllNonAccountEventsForUser(req.params.userId);
-    res.json(result);
+    return await ds.events.removeAllNonAccountEventsForUser(req.params.userId);
   }));
 
   router.post('/:userId/eventsDELETE/:eventId', aeh(async (req, res) => {
-    const deleted = await ds.events.delete(req.params.userId, req.body);
-    res.json(deleted);
+    return await ds.events.delete(req.params.userId, req.body);
   }));
 
   // ------- attachments ------- //
@@ -152,18 +134,16 @@ async function serve (ds, port, options) {
     const readableStream = new PassThrough();
     req.pipe(readableStream);
     attachmentItem.attachmentData = readableStream;
-    const event = await ds.events.addAttachment(req.params.userId, req.params.eventId, attachmentItem);
-    res.json(event);
+    return await ds.events.addAttachment(req.params.userId, req.params.eventId, attachmentItem);
   }));
 
   router.get('/:userId/events/:eventId/attachments/:fileId', aeh(async (req, res) => {
     const readableData = await ds.events.getAttachment(req.params.userId, req.params.eventId, req.params.fileId);
     readableData.pipe(res);
-  }));
+  }, false));
 
   router.delete('/:userId/events/:eventId/attachments/:fileId', aeh(async (req, res) => {
-    const deleted = await ds.events.deleteAttachment(req.params.userId, req.params.eventId, req.params.fileId);
-    res.json(deleted);
+    return await ds.events.deleteAttachment(req.params.userId, req.params.eventId, req.params.fileId);
   }));
 
   // prefix handling
@@ -174,13 +154,15 @@ async function serve (ds, port, options) {
 
 /**
  * Wrap an express route handler with error management for async call
- * Async Error Handler - Note: express 5.x.x should provide a similar consecpt
+ * Async Error Handler - Note: express 5.x.x should provide a similar concept
+ * @param {callback} handler - a function (req, res)
+ * @param {boolean} sendRes - default (true) send returned as JSON
  */
-function aeh (handler) {
+function aeh (handler, sendRes = true) {
   return function (req, res, next) {
     handler(req, res).then(
       function (result) {
-        // do nothing
+        if (sendRes) res.json(result);
       }, function (error) {
         // send generic error code
         // error Id will be packaged in errorToJSON
