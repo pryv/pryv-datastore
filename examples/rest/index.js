@@ -161,14 +161,14 @@ function createRestUserStreams (rs) {
       return result;
     },
 
-    async getDeletions (userId, deletionsSince) {
-      const deletions = await rs.get(userId, '/streamsDeletions', { deletionsSince });
+    async getDeletions (userId, query) {
+      const deletions = await rs.get(userId, '/streamsDeletions', query);
       return deletions;
     },
 
     async createDeleted (userId, streamData) {
       const result = await rs.post(userId, '/streamsDeletions', streamData);
-      return result.body;
+      return result;
     },
 
     async delete (userId, streamId) {

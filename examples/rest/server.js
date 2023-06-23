@@ -66,7 +66,8 @@ async function serve (ds, port, options) {
   }));
 
   router.get('/:userId/streamsDeletions', aeh(async (req, res) => {
-    return await ds.streams.getDeletions(req.params.userId, req.query.deletionsSince);
+    if (req.query.deletedSince != null) req.query.deletedSince = Number.parseFloat(req.query.deletedSince);
+    return await ds.streams.getDeletions(req.params.userId, req.query);
   }));
 
   router.post('/:userId/streamsDeletions', aeh(async (req, res) => {
