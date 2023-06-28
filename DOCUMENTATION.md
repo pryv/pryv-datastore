@@ -325,6 +325,8 @@ Helper "factory" methods for data store errors (see error ids).
 | [data] | <code>\*</code> | 
 | [innerError] | <code>Error</code> | 
 
+<a name="module_datastore"></a>
+
 ## datastore
 
 * [datastore](#module_datastore)
@@ -379,9 +381,9 @@ Prototype object for per-user events data.
     * [.getDeletionsStreamed(userId, query, [options])](#module_UserEvents.getDeletionsStreamed) ⇒ <code>Promise.&lt;ReadableStream.&lt;EventDeletionItem&gt;&gt;</code>
     * [.getHistory(userId, eventId)](#module_UserEvents.getHistory) ⇒ <code>Promise.&lt;Array.&lt;Event&gt;&gt;</code>
     * [.create(userId, eventData)](#module_UserEvents.create) ⇒ [<code>Promise.&lt;Event&gt;</code>](#Event)
-    * [.saveAttachedFiles(userId, eventId, attachmentsItems)](#module_UserEvents.saveAttachedFiles) ⇒ [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem)
+    * [.addAttachment(userId, eventId, attachmentItem)](#module_UserEvents.addAttachment) ⇒ [<code>Promise.&lt;Event&gt;</code>](#Event)
     * [.getAttachment(userId, eventId, fileId)](#module_UserEvents.getAttachment) ⇒ <code>Promise.&lt;ReadableStream&gt;</code>
-    * [.deleteAttachedFile(userId, eventId, fileId)](#module_UserEvents.deleteAttachedFile) ⇒ [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem)
+    * [.deleteAttachment(userId, eventId, fileId)](#module_UserEvents.deleteAttachment) ⇒ [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem)
     * [.update(userId, eventData)](#module_UserEvents.update) ⇒ <code>Promise.&lt;boolean&gt;</code>
     * [.delete(userId, eventId)](#module_UserEvents.delete) ⇒ <code>Promise.&lt;(Event\|EventDeletionItem)&gt;</code>
 
@@ -460,11 +462,13 @@ Get events as a stream for this user.
 | userId | [<code>identifier</code>](#identifier) | 
 | eventData | <code>object</code> | 
 
-<a name="module_UserEvents.saveAttachedFiles"></a>
+<a name="module_UserEvents.addAttachment"></a>
 
-### UserEvents.saveAttachedFiles(userId, eventId, attachmentsItems) ⇒ [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem)
+### UserEvents.addAttachment(userId, eventId, attachmentItem) ⇒ [<code>Promise.&lt;Event&gt;</code>](#Event)
+Add the given file to the event.
+
 **Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  
-**Returns**: [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem) - - The ids and other information related to the attachments  
+**Returns**: [<code>Promise.&lt;Event&gt;</code>](#Event) - - The updated event  
 **Throws**:
 
 - [<code>PryvDataStoreError</code>](#PryvDataStoreError) with id `item-already-exists`
@@ -476,7 +480,7 @@ Get events as a stream for this user.
 | --- | --- | --- |
 | userId | [<code>identifier</code>](#identifier) |  |
 | eventId | [<code>identifier</code>](#identifier) |  |
-| attachmentsItems | [<code>Array.&lt;AttachmentItem&gt;</code>](#AttachmentItem) | Array of attachments informations. |
+| attachmentItem | [<code>AttachmentItem</code>](#AttachmentItem) | The file's information and data |
 
 <a name="module_UserEvents.getAttachment"></a>
 
@@ -491,9 +495,9 @@ Retrieve the specified file as a stream.
 | eventId | [<code>identifier</code>](#identifier) | 
 | fileId | [<code>identifier</code>](#identifier) | 
 
-<a name="module_UserEvents.deleteAttachedFile"></a>
+<a name="module_UserEvents.deleteAttachment"></a>
 
-### UserEvents.deleteAttachedFile(userId, eventId, fileId) ⇒ [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem)
+### UserEvents.deleteAttachment(userId, eventId, fileId) ⇒ [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem)
 Delete the specified file.
 
 **Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  
@@ -513,7 +517,7 @@ Delete the specified file.
 <a name="module_UserEvents.update"></a>
 
 ### UserEvents.update(userId, eventData) ⇒ <code>Promise.&lt;boolean&gt;</code>
-Fully replace an event with new Data
+Update the specified event with new data (the given event data replaces the original data).
 
 **Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  
 **Returns**: <code>Promise.&lt;boolean&gt;</code> - - true if an event was updated  

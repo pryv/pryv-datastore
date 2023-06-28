@@ -24,7 +24,7 @@ export function applyOnStream(stream: any, parentId?: string): any;
  * @param {string} [parentId]  - for parentId of the stream
  */
 export function applyOnStreams(streams: any[], parentId?: string): any;
-export declare const UnknownDate: number;
-export declare const SystemAccessId: string;
-export declare const UnknownAccessId: string;
-export declare const ExternalAccessIdPrefix: string;
+export declare let UnknownDate: number;
+export declare let SystemAccessId: string;
+export declare let UnknownAccessId: string;
+export declare let ExternalAccessIdPrefix: string;

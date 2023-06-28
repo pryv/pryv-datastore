@@ -116,8 +116,8 @@ export type Logger = {
  * @returns {Promise<DataStore>} The data store object itself (for method chaining).
  */
 declare function init(params: StoreInitializationParams): Promise<any>;
-declare const streams: UserStreams;
-declare const events: UserEvents;
+declare let streams: UserStreams;
+declare let events: UserEvents;
 /**
  * Called when the given user is deleted from Pryv.io, to let the store delete the related data if appropriate.
  * @param {identifier} userId

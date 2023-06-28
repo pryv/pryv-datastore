@@ -2,9 +2,8 @@
 
 Library and tools for accessing external data stores within Pryv.io.
 
-**⚠️ This is a release candidate. The API is mostly final, but the following are likely to change:**
+**⚠️ This is the first public release; the following are still likely to change:**
 
-- File attachments management methods
 - Code examples
 - API documentation
 - (For contributors) Development environment
