@@ -323,16 +323,16 @@ function errorFromJSON (jsonString) {
   }
   switch (holder.id) {
     case ErrorsIds.InvalidRequestStructure:
-      return new ds.errors.invalidRequestStructure(holder.message, holder.data, holder.innerError);
+      return ds.errors.invalidRequestStructure(holder.message, holder.data, holder.innerError);
     case ErrorsIds.UnknownResource:
-      return new ds.errors.unknownResource(holder.data.ressourceType, holder.data.id, holder.innerError);
+      return ds.errors.unknownResource(holder.data.ressourceType, holder.data.id, holder.innerError);
     case ErrorsIds.ItemAlreadyExists:
-      return new ds.errors.itemAlreadyExists(holder.data.ressourceType, holder.data.conflictingKeys, holder.innerError);
+      return ds.errors.itemAlreadyExists(holder.data.ressourceType, holder.data.conflictingKeys, holder.innerError);
     case ErrorsIds.InvalidItemId:
-      return new ds.errors.invalidItemId(holder.message, holder.data, holder.innerError);
+      return ds.errors.invalidItemId(holder.message, holder.data, holder.innerError);
     case ErrorsIds.UnsupportedOperation:
-      return new ds.errors.unsupportedOperation(holder.message, holder.data, holder.innerError);
+      return ds.errors.unsupportedOperation(holder.message, holder.data, holder.innerError);
   }
 
-  return new ds.errors.unexpectedError(holder.message, holder.data, holder.innerError);
+  return ds.errors.unexpectedError(holder.message, holder.data, holder.innerError);
 }
