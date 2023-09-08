@@ -10,14 +10,11 @@ const timestamp = require('unix-timestamp');
 const { Readable } = require('stream');
 const { localStorePrepareQuery } = require('./localStoreEventQueries');
 
-let keyValueData;
-
 /**
  * Dummy data store serving predictable static data.
  */
 module.exports = ds.createDataStore({
   async init (params) {
-    keyValueData = params.storeKeyValueData;
     this.streams = createUserStreams();
     this.events = createUserEvents();
     return this;
@@ -41,7 +38,6 @@ function createUserStreams () {
 
     async getOne (userId, streamId, query) {
       // store last call in keyValueStore for tests
-      await keyValueData.set(userId, 'lastStreamCall', Object.assign({ id: streamId }, query));
       const stream = findStream(streamId, genStreams(userId));
       return stream;
     }
@@ -76,21 +72,15 @@ function createUserEvents () {
      */
     async get (userId, storeQuery, options) { // eslint-disable-line no-unused-vars
       const query = localStorePrepareQuery(storeQuery);
-      const lastStreamCall = await keyValueData.get(userId, 'lastStreamCall');
       let events = [{
         id: 'dummyevent0',
         type: 'note/txt',
         streamIds: ['mariana'],
         content: 'hello',
         time: timestamp.now()
-      }, {
-        id: 'laststreamcall',
-        type: 'data/json',
-        streamIds: ['antonia'],
-        content: lastStreamCall,
-        time: timestamp.now()
       }];
 
+      console.log(events);
       // support stream filtering (only for one "any")
       const streamQuery = query.filter((i) => { return i.type === 'streamsQuery'; });
       if (streamQuery.length > 0 && streamQuery[0].content[0]) {
@@ -99,6 +89,8 @@ function createUserEvents () {
         events = events.filter((e) => e.streamIds.includes(filterByStreamId));
       }
       ds.defaults.applyOnEvents(events);
+
+      console.log(events);
       return events;
     }
   });

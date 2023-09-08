@@ -7,4 +7,9 @@ function debugMiddleware (req, res, next) {
   next();
 }
 
-server(dummy, 5005, { middleware: debugMiddleware });
+(async () => {
+  await dummy.init();
+  await server(dummy, 5005, { middleware: debugMiddleware });
+})();
+
+

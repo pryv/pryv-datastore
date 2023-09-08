@@ -165,6 +165,7 @@ function aeh (handler, sendRes = true) {
       function (result) {
         if (sendRes) res.json(result);
       }, function (error) {
+        console.log(error);
         // send generic error code
         // error Id will be packaged in errorToJSON
         res.status(400);
