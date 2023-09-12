@@ -78,19 +78,25 @@ function createUserEvents () {
         streamIds: ['mariana'],
         content: 'hello',
         time: timestamp.now()
+      }, {
+        id: 'laststreamcall',
+        type: 'data/json',
+        streamIds: ['antonia'],
+        content: 'bye',
+        time: timestamp.now()
       }];
 
-      console.log(events);
+      console.log('FOUND', events);
       // support stream filtering (only for one "any")
       const streamQuery = query.filter((i) => { return i.type === 'streamsQuery'; });
       if (streamQuery.length > 0 && streamQuery[0].content[0]) {
         const firstOrItem = streamQuery[0].content[0];
-        const filterByStreamId = firstOrItem[0]?.any[0];
-        events = events.filter((e) => e.streamIds.includes(filterByStreamId));
+        const anyStreamList = firstOrItem[0]?.any || [];
+        events = events.filter((e) => anyStreamList.includes(e.streamIds[0]));
       }
       ds.defaults.applyOnEvents(events);
 
-      console.log(events);
+      console.log('SENT', events);
       return events;
     }
   });
