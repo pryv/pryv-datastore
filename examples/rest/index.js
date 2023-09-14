@@ -10,6 +10,7 @@ const { PassThrough, Transform } = require('stream');
 const ds = require('../../src'); // datastore
 const superagent = require('superagent');
 const ErrorsIds = require('../../src/ErrorIds');
+const inspect = require('util').inspect;
 
 /**
  * Pass-through store that forwards all calls to an API
@@ -76,8 +77,12 @@ module.exports = ds.createDataStore({
   async post (userId, path, content) {
     try {
       const res = await superagent.post(this.url(userId) + path).set(this.headers(userId)).send(content);
+      this.debugLog('POST', { userId, path, content, body: res.body });
       return res.body;
-    } catch (e) { this.apiError(e); }
+    } catch (e) {
+      this.debugLog('POST ERROR', { userId, path, content, e });
+      this.apiError(e);
+    }
   },
 
   postAndPipe (userId, path, content, writeableStream) {
@@ -85,16 +90,22 @@ module.exports = ds.createDataStore({
   },
 
   async postDataStream (userId, path, keyValue, readableStream) {
+    this.debugLog('postDataStream START', { userId, path, keyValue });
     return new Promise((resolve, reject) => {
       const request = superagent.post(this.url(userId) + path).set(this.headers(userId)).query(keyValue);
       readableStream.pipe(request);
-      request.on('error', (e) => { reject(e); });
+      request.on('error', (e) => {
+        this.debugLog('postDataStream ERROR', { e });
+        reject(e);
+      });
       request.on('end', () => {
         try {
           // @ts-ignore
           const result = JSON.parse(request.res?.text);
+          this.debugLog('postDataStream RESULT', { result });
           resolve(result);
         } catch (e) {
+          this.debugLog('postDataStream ERROR', { e });
           reject(e);
         }
       });
@@ -104,8 +115,12 @@ module.exports = ds.createDataStore({
   async get (userId, path, query = {}) {
     try {
       const res = await superagent.get(this.url(userId) + path).set(this.headers(userId)).query(query);
+      this.debugLog('GET', { userId, path, query, body: res.body });
       return res.body;
-    } catch (e) { this.apiError(e); }
+    } catch (e) {
+      this.debugLog('GET ERROR', { userId, path, query, e });
+      this.apiError(e);
+    }
   },
 
   getAndPipe (userId, path, query, writeableStream) {
@@ -115,15 +130,29 @@ module.exports = ds.createDataStore({
   async put (userId, path, content) {
     try {
       const res = await superagent.put(this.url(userId) + path).set(this.headers(userId)).send(content);
+      this.debugLog('PUT', { userId, path, content, body: res.body });
       return res.body;
-    } catch (e) { this.apiError(e); }
+    } catch (e) {
+      this.debugLog('PUT ERROR', { userId, path, content, e });
+      this.apiError(e);
+    }
   },
 
   async delete (userId, path, query) {
     try {
       const res = await superagent.delete(this.url(userId) + path).set(this.headers(userId)).query(query);
+      this.debugLog('DELETE', { userId, path, query, body: res.body });
       return res.body;
-    } catch (e) { this.apiError(e); }
+    } catch (e) {
+      this.debugLog('DELETE ERROR', { userId, path, query, e });
+      this.apiError(e);
+    }
+  },
+
+  debugLog (message, info) {
+    if (!this.settings.debug) return;
+    const content = message + ': ' + inspect(info, false, 10, true);
+    console.log('[REST DATASTORE] ' + content);
   }
 });
 
@@ -257,7 +286,7 @@ function createRestUserEvents (rs) {
     async update (userId, eventData) {
       const event = await rs.put(userId, '/events', eventData);
       ds.defaults.applyOnEvent(event);
-      //$$({userId, eventData, event});
+      // $$({userId, eventData, event});
       return event;
     },
     async delete (userId, originalEvent) {

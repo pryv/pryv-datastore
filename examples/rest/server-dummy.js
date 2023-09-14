@@ -11,5 +11,3 @@ function debugMiddleware (req, res, next) {
   await dummy.init();
   await server(dummy, 5005, { middleware: debugMiddleware });
 })();
-
-

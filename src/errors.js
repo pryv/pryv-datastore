@@ -13,7 +13,7 @@ const ErrorIds = require('./ErrorIds');
  * Helper "factory" methods for data store errors (see error ids).
  * @exports errors
  */
-const factory = module.exports = {
+module.exports = {
   /**
    * @param {string} message
    * @param {*} data

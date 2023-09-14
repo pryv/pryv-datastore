@@ -34,7 +34,7 @@ async function serve (ds, port, options) {
   }));
 
   router.get('/:userId/storageSize', aeh(async (req, res) => {
-    return await ds.getUserStorageSize (req.params.userId);
+    return await ds.getUserStorageSize(req.params.userId);
   }));
 
   // ---------------------- streams ------------------ //
