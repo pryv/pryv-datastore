@@ -216,13 +216,15 @@ function createRestUserEvents (rs) {
     },
 
     async getStreamed (userId, query, options) {
-      const streamedEvents = new JSONStreamedItems();
+      const streamedEvents = new JSONStreamedItems(rs.debugLog.bind(rs));
+      rs.debugLog('EVENT GET STREAM START', { userId, query, options });
       rs.postAndPipe(userId, '/eventsGETStreamed', { query, options }, streamedEvents);
       return streamedEvents;
     },
 
     async getDeletionsStreamed (userId, query, options) {
-      const streamedEvents = new JSONStreamedItems();
+      const streamedEvents = new JSONStreamedItems(rs.debugLog.bind(rs));
+      rs.debugLog('EVENTDELETION GET STREAM START', { userId, query, options });
       rs.postAndPipe(userId, '/eventsGETDeletionsStreamed', { query, options }, streamedEvents);
       return streamedEvents;
     },
@@ -305,8 +307,10 @@ function createRestUserEvents (rs) {
 class JSONStreamedItems extends Transform {
   buffer;
   count;
-  constructor () {
+  debugLog;
+  constructor (debugLog) {
     super({ readableObjectMode: true });
+    this.debugLog = debugLog || function () {};
     this.buffer = '';
     this.count = 0;
   }
@@ -321,6 +325,7 @@ class JSONStreamedItems extends Transform {
       const eventStr = this.buffer.substring(0, n);
       this.buffer = this.buffer.substring(n + 1);
       const event = JSON.parse(eventStr);
+      this.debugLog('STREAMING EVENT', { event });
       ds.defaults.applyOnEvent(event);
       this.push(event);
       this.count++;
