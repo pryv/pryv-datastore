@@ -5,7 +5,7 @@
  * under the terms of the 3-Clause BSD License
  * SPDX-License-Identifier: BSD-3-Clause
  */
-const { PassThrough, Transform } = require('stream');
+const { PassThrough, Transform, Readable } = require('stream');
 
 const ds = require('../../src'); // datastore
 const superagent = require('superagent');
@@ -216,6 +216,12 @@ function createRestUserEvents (rs) {
     },
 
     async getStreamed (userId, query, options) {
+      if (rs.settings.mockEventGetStreaming) {
+        rs.debugLog('EVENT GET STREAM MOCK');
+        const events = await this.get(userId, query, options);
+        const readable = Readable.from(events);
+        return readable;
+      }
       const streamedEvents = new JSONStreamedItems(rs.debugLog.bind(rs));
       rs.debugLog('EVENT GET STREAM START', { userId, query, options });
       rs.postAndPipe(userId, '/eventsGETStreamed', { query, options }, streamedEvents);
