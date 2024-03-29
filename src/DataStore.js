@@ -35,7 +35,15 @@ const DataStore = module.exports = {
    * Called when the given user is deleted from Pryv.io, to let the store delete the related data if appropriate.
    * @param {identifier} userId
    */
-  async deleteUser (userId) { throw new Error('Not implemented'); } // eslint-disable-line no-unused-vars
+  async deleteUser (userId) { throw new Error('Not implemented'); }, // eslint-disable-line no-unused-vars
+
+  /**
+   * Returns information on storage used
+   * @param {identifier} userId
+   * @returns {Promise<UserStorageInfos>}
+   */
+  async getUserStorageInfos (userId) { throw new Error('Not implemented'); } // eslint-disable-line no-unused-vars
+
 };
 
 // limit tampering on existing properties
@@ -73,6 +81,18 @@ for (const propName of Object.getOwnPropertyNames(DataStore)) {
  * @param {string} key
  * @param {*} value
  * @returns {void}
+ */
+
+/**
+ * @typedef {object} UserStorageInfos - All infos are optional, infos can be extended with custom properties
+ * @property {number} [totalSizeKb] total storage used in Kb
+ * @property {Object} [streams]
+ * @property {number} [streams.count] number of streams
+ * @property {number} [streams.sizeKb] size used by stream in Kb
+ * @property {number} [events.count] number of events
+ * @property {number} [events.sizeKb] size used by events in Kb
+ * @property {number} [files.count] number of files
+ * @property {number} [files.sizeKb] size used by files in Kb
  */
 
 /**

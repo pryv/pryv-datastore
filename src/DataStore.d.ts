@@ -111,6 +111,27 @@ export type Logger = {
     debug: FnLog;
 };
 /**
+ * Storage infos All infos are optional, infos can be extended with custom properties
+ */
+export type UserStorageInfos = {
+    /**
+     * total storage used in Kb
+     */
+    totalSizeKb?: number;
+    streams?: {
+        count?: number;
+        sizeKb?: number;
+    };
+    events?: {
+        count?: number;
+        sizeKb?: number;
+    };
+    files?: {
+        count?: number;
+        sizeKb?: number;
+    };
+};
+/**
  * Initialize the store.
  * @param {StoreInitializationParams} params
  * @returns {Promise<DataStore>} The data store object itself (for method chaining).
@@ -123,4 +144,9 @@ declare let events: UserEvents;
  * @param {identifier} userId
  */
 declare function deleteUser(userId: string): Promise<never>;
+/**
+ * Returns information on storage used
+ * @param {identifier} userId 
+ */
+declare function getUserStorageInfos (userId): Promise<UserStorageInfos>;
 export {};

@@ -56,9 +56,20 @@ For the details, see the [API documentation](DOCUMENTATION.md).
 1. Deploy your module in your chosen location on each core machine
 2. Register it in platform configuration under key `custom:dataStores`; each data store definition has those properties:
    - `id` (string): The store's id – this is used in data so do not change
-   - `name` (string): The store's name, for logging and messaging purposes
+   - `name` (string): The store's name, for logging and messaging 
+   purposes
+   - `path` (string): Fully qualified path to reach out to your package
    - `settings` (object): Any settings to pass to your data store implementation
 
+
+#### Installation in docker containers
+
+Notes about `path` on docker implementation we recommend to place your package in the configuration folder.
+- Open-Pryv.io: folder `configs/your-data-store` will be accessible with `/app/configs/your-data-store`
+- Entreprise edition: folder `var-pryv/core/conf/your-data-store` will be accessible with `/app/conf/your-data-store`
+
+`npm install` should be run upfront with you package with the very same node version than the one in docker containers.
+- Pryv 1.9.0 => node 18.14.3 
 
 ## Contributing
 
