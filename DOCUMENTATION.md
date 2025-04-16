@@ -578,7 +578,7 @@ Get a stream
 | query | <code>object</code> |  |  |
 | query.id | [<code>identifier</code>](#identifier) |  | '*', means root streamId. Notice parentId is not implemented by stores |
 | [query.childrenDepth] | <code>number</code> | <code>0</code> | 0 = NO; -1 = ALL; 1.. Gives the number of levels to expand |
-| [query.excludeIds] | [<code>Array.&lt;identifier&gt;</code>](#identifier) |  | list of streamIds to exclude from query. if childrenDepth is >0 or < 0, children of excludedIds should be excludded too |
+| [query.excludedIds] | [<code>Array.&lt;identifier&gt;</code>](#identifier) |  | list of streamIds to exclude from query. if childrenDepth is >0 or < 0, children of excludedIds should be excludded too |
 | [query.includeTrashed] | <code>boolean</code> |  | (equivalent to state = 'all') |
 
 <a name="module_UserStreams.get"></a>
@@ -595,7 +595,7 @@ Query streams
 | query | <code>object</code> |  |  |
 | [query.parentId] | [<code>identifier</code>](#identifier) |  | '*' or `null`, means root streamId. |
 | [query.childrenDepth] | <code>number</code> | <code>0</code> | 0 = NO; -1 = ALL; 1.. Gives the number of levels to expand |
-| [query.excludeIds] | [<code>Array.&lt;identifier&gt;</code>](#identifier) |  | list of streamIds to exclude from query. if childrenDepth is >0 or < 0, children of excludedIds should be excludded too |
+| [query.excludedIds] | [<code>Array.&lt;identifier&gt;</code>](#identifier) |  | list of streamIds to exclude from query. if childrenDepth is >0 or < 0, children of excludedIds should be excludded too |
 | [query.includeTrashed] | <code>boolean</code> |  | (equivalent to state = 'all') |
 
 <a name="module_UserStreams.getDeletions"></a>

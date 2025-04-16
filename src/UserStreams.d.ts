@@ -14,14 +14,14 @@ export type StreamDeletionItem = {
  * @param {object} query
  * @param {identifier} query.id '*', means root streamId. Notice parentId is not implemented by stores
  * @param {number} [query.childrenDepth=0] 0 = NO; -1 = ALL; 1.. Gives the number of levels to expand
- * @param {identifier[]} [query.excludeIds] list of streamIds to exclude from query. if childrenDepth is >0 or < 0, children of excludedIds should be excludded too
+ * @param {identifier[]} [query.excludedIds] list of streamIds to exclude from query. if childrenDepth is >0 or < 0, children of excludedIds should be excludded too
  * @param {boolean} [query.includeTrashed] (equivalent to state = 'all')
  * @returns {Promise<Stream|null>} - the stream or null if not found:
  */
 export declare function getOne(userId: string, streamId: any, query: {
     id: string;
     childrenDepth?: number;
-    excludeIds?: string[];
+    excludedIds?: string[];
     includeTrashed?: boolean;
 }): Promise<any>;
 /**
@@ -30,14 +30,14 @@ export declare function getOne(userId: string, streamId: any, query: {
  * @param {object} query
  * @param {identifier} [query.parentId] '*' or `null`, means root streamId.
  * @param {number} [query.childrenDepth=0] 0 = NO; -1 = ALL; 1.. Gives the number of levels to expand
- * @param {identifier[]} [query.excludeIds] list of streamIds to exclude from query. if childrenDepth is >0 or < 0, children of excludedIds should be excludded too
+ * @param {identifier[]} [query.excludedIds] list of streamIds to exclude from query. if childrenDepth is >0 or < 0, children of excludedIds should be excludded too
  * @param {boolean} [query.includeTrashed] (equivalent to state = 'all')
  * @returns {Promise<Stream[]>} - an array of streams
  */
 export declare function get(userId: string, query: {
     parentId?: string;
     childrenDepth?: number;
-    excludeIds?: string[];
+    excludedIds?: string[];
     includeTrashed?: boolean;
 }): Promise<any[]>;
 /**

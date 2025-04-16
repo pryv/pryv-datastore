@@ -10,13 +10,13 @@ export type UserStreams = {
     getOne(userId: string, streamId: any, query: {
         id: string;
         childrenDepth?: number;
-        excludeIds?: string[];
+        excludedIds?: string[];
         includeTrashed?: boolean;
     }): Promise<any>;
     get(userId: string, query: {
         parentId?: string;
         childrenDepth?: number;
-        excludeIds?: string[];
+        excludedIds?: string[];
         includeTrashed?: boolean;
     }): Promise<any[]>;
     getDeletions(userId: string, deletionsSince: number): Promise<import("./UserStreams").StreamDeletionItem>;
