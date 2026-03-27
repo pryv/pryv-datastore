@@ -170,7 +170,32 @@ const UserEvents = module.exports = {
    * @throws {PryvDataStoreError} with id `resource-is-readonly` if either storage or parent stream is read-only
    * @returns {Promise<Event|EventDeletionItem>} - The trashed Event
    */
-  async delete (userId, eventId) { throw errors.unsupportedOperation('events.delete'); }
+  async delete (userId, eventId) { throw errors.unsupportedOperation('events.delete'); },
+
+  // -- Backup / Restore methods --
+
+  /**
+   * Export all events for a user as clean application-level objects (no engine artifacts).
+   * Includes trashed/deleted events.
+   * @param {identifier} userId
+   * @returns {Promise<AsyncIterable<Event>>}
+   */
+  async exportAll (userId) { throw errors.unsupportedOperation('events.exportAll'); },
+
+  /**
+   * Import events for a user from an async iterable of event objects.
+   * @param {identifier} userId
+   * @param {AsyncIterable<Event>|Array<Event>} items
+   * @returns {Promise<void>}
+   */
+  async importAll (userId, items) { throw errors.unsupportedOperation('events.importAll'); },
+
+  /**
+   * Remove all events for a user (actual delete, not soft delete).
+   * @param {identifier} userId
+   * @returns {Promise<void>}
+   */
+  async clearAll (userId) { throw errors.unsupportedOperation('events.clearAll'); }
 };
 
 // limit tampering on existing properties

@@ -104,7 +104,32 @@ const UserStreams = module.exports = {
    * @throws resource-is-readonly <=== Thrown because item cannot be updated
    * @returns {Promise<Stream|StreamDeletionItem>} - The trashed Stream
    */
-  async delete (userId, streamId) { throw errors.unsupportedOperation('streams.delete'); }
+  async delete (userId, streamId) { throw errors.unsupportedOperation('streams.delete'); },
+
+  // -- Backup / Restore methods --
+
+  /**
+   * Export all streams for a user as clean application-level objects (no engine artifacts).
+   * Includes trashed/deleted streams.
+   * @param {identifier} userId
+   * @returns {Promise<AsyncIterable<Stream>>}
+   */
+  async exportAll (userId) { throw errors.unsupportedOperation('streams.exportAll'); },
+
+  /**
+   * Import streams for a user from an async iterable of stream objects.
+   * @param {identifier} userId
+   * @param {AsyncIterable<Stream>|Array<Stream>} items
+   * @returns {Promise<void>}
+   */
+  async importAll (userId, items) { throw errors.unsupportedOperation('streams.importAll'); },
+
+  /**
+   * Remove all streams for a user (actual delete, not soft delete).
+   * @param {identifier} userId
+   * @returns {Promise<void>}
+   */
+  async clearAll (userId) { throw errors.unsupportedOperation('streams.clearAll'); }
 };
 
 // limit tampering on existing properties

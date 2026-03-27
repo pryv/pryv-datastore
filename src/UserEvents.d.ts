@@ -162,3 +162,23 @@ export declare function update(userId: string, eventData: any): Promise<boolean>
  */
 declare function _delete(userId: string, eventId: string): Promise<any>;
 export { _delete as delete };
+/**
+ * Export all events for a user as clean application-level objects (no engine artifacts).
+ * Includes trashed/deleted events.
+ * @param {identifier} userId
+ * @returns {Promise<AsyncIterable<Event>>}
+ */
+export declare function exportAll(userId: string): Promise<AsyncIterable<any>>;
+/**
+ * Import events for a user from an async iterable of event objects.
+ * @param {identifier} userId
+ * @param {AsyncIterable<Event>|Array<Event>} items
+ * @returns {Promise<void>}
+ */
+export declare function importAll(userId: string, items: AsyncIterable<any> | any[]): Promise<void>;
+/**
+ * Remove all events for a user (actual delete, not soft delete).
+ * @param {identifier} userId
+ * @returns {Promise<void>}
+ */
+export declare function clearAll(userId: string): Promise<void>;
