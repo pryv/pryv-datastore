@@ -42,7 +42,27 @@ const DataStore = module.exports = {
    * @param {identifier} userId
    * @returns {Promise<UserStorageInfos>}
    */
-  async getUserStorageInfos (userId) { throw new Error('Not implemented'); } // eslint-disable-line no-unused-vars
+  async getUserStorageInfos (userId) { throw new Error('Not implemented'); }, // eslint-disable-line no-unused-vars
+
+  /**
+   * Declare the optional capabilities this store implements, per feature.
+   * Stores not overriding this support no optional feature; partial
+   * support is fine (e.g. a subset of query operators).
+   * The returned object is surfaced to API clients in the `clientData`
+   * of the store's root stream — it must be JSON-serializable and must
+   * not contain secrets.
+   * @returns {StoreSupports}
+   * @example
+   * supports () {
+   *   return {
+   *     contentQueries: { // events.get content/clientData conditions
+   *       fields: ['content', 'clientData'],
+   *       operators: ['eq', 'in', 'prefix'] // subset of: eq neq in exists gt gte lt lte prefix
+   *     }
+   *   };
+   * }
+   */
+  supports () { return {}; }
 
 };
 
@@ -53,6 +73,13 @@ for (const propName of Object.getOwnPropertyNames(DataStore)) {
 
 /**
  * @typedef {string} identifier - A string uniquely identifying an object (user, event, stream, etc.)
+ */
+
+/**
+ * @typedef {Object} StoreSupports - Optional-capability declaration, keyed by feature.
+ * @property {Object} [contentQueries] - Support for events.get `content`/`clientData` query conditions.
+ * @property {string[]} [contentQueries.fields] - Supported condition fields ('content', 'clientData').
+ * @property {string[]} [contentQueries.operators] - Supported operators (subset of: eq, neq, in, exists, gt, gte, lt, lte, prefix).
  */
 
 /**
