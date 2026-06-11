@@ -146,7 +146,24 @@ declare let events: UserEvents;
 declare function deleteUser(userId: string): Promise<never>;
 /**
  * Returns information on storage used
- * @param {identifier} userId 
+ * @param {identifier} userId
  */
-declare function getUserStorageInfos (userId): Promise<UserStorageInfos>;
+declare function getUserStorageInfos (userId: string): Promise<UserStorageInfos>;
+/**
+ * Optional-capability declaration, keyed by feature.
+ */
+declare type StoreSupports = {
+    contentQueries?: {
+        fields?: string[];
+        operators?: string[];
+    };
+};
+/**
+ * Declare the optional capabilities this store implements, per feature.
+ * Stores not overriding this support no optional feature; partial support
+ * is fine (e.g. a subset of query operators). The returned object is
+ * surfaced to API clients in the `clientData` of the store's root stream —
+ * it must be JSON-serializable and must not contain secrets.
+ */
+declare function supports(): StoreSupports;
 export {};
