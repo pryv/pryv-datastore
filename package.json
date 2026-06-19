@@ -4,7 +4,7 @@
   "description": "Library and tools for accessing external data stores from Pryv.io",
   "homepage": "https://pryv.com",
   "license": "BSD-3-Clause",
-  "author": "Pryv S.A. <info@pryv.com> (https://pryv.com)",
+  "author": "Pryv <info@pryv.com> (https://pryv.com)",
   "main": "src/index.js",
   "types": "src/index.d.ts",
   "devDependencies": {
