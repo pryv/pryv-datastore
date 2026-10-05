@@ -17,7 +17,7 @@
     "express": "^4.18.2",
     "jsdoc-to-markdown": "^8.0.0",
     "jsdoc-tsimport-plugin": "^1.0.5",
-    "mocha": "^10.2.0",
+    "mocha": "^12.0.3",
     "source-licenser": "^2.0.5",
     "superagent": "^8.0.9",
     "typescript": "^5.1.5"

@@ -53,6 +53,9 @@ All data store implementations inherit from this via <a href="datastore#createDa
 <dt><a href="#identifier">identifier</a> : <code>string</code></dt>
 <dd><p>A string uniquely identifying an object (user, event, stream, etc.)</p>
 </dd>
+<dt><a href="#StoreSupports">StoreSupports</a> : <code>Object</code></dt>
+<dd><p>Optional-capability declaration, keyed by feature.</p>
+</dd>
 <dt><a href="#timestamp">timestamp</a> : <code>number</code></dt>
 <dd><p>A positive floating-point number representing the number of seconds since a reference time (Unix epoch time).</p>
 </dd>
@@ -66,6 +69,9 @@ All data store implementations inherit from this via <a href="datastore#createDa
 <dd></dd>
 <dt><a href="#FnKeyValueSet">FnKeyValueSet</a> ⇒ <code>void</code></dt>
 <dd></dd>
+<dt><a href="#UserStorageInfos">UserStorageInfos</a> : <code>object</code></dt>
+<dd><p>All infos are optional, infos can be extended with custom properties</p>
+</dd>
 <dt><a href="#KeyValueData">KeyValueData</a> : <code>object</code></dt>
 <dd></dd>
 <dt><a href="#StoreInitializationParams">StoreInitializationParams</a> : <code>object</code></dt>
@@ -117,6 +123,8 @@ All data store implementations inherit from this via [datastore#createDataStore]
     * [.events](#module_DataStore.events) : [<code>UserEvents</code>](#UserEvents)
     * [.init(params)](#module_DataStore.init) ⇒ [<code>Promise.&lt;DataStore&gt;</code>](#DataStore)
     * [.deleteUser(userId)](#module_DataStore.deleteUser)
+    * [.getUserStorageInfos(userId)](#module_DataStore.getUserStorageInfos) ⇒ [<code>Promise.&lt;UserStorageInfos&gt;</code>](#UserStorageInfos)
+    * [.supports()](#module_DataStore.supports) ⇒ [<code>StoreSupports</code>](#StoreSupports)
 
 <a name="module_DataStore.streams"></a>
 
@@ -153,6 +161,39 @@ Called when the given user is deleted from Pryv.io, to let the store delete the 
 | --- | --- |
 | userId | [<code>identifier</code>](#identifier) | 
 
+<a name="module_DataStore.getUserStorageInfos"></a>
+
+### DataStore.getUserStorageInfos(userId) ⇒ [<code>Promise.&lt;UserStorageInfos&gt;</code>](#UserStorageInfos)
+Returns information on storage used
+
+**Kind**: static method of [<code>DataStore</code>](#module_DataStore)  
+
+| Param | Type |
+| --- | --- |
+| userId | [<code>identifier</code>](#identifier) | 
+
+<a name="module_DataStore.supports"></a>
+
+### DataStore.supports() ⇒ [<code>StoreSupports</code>](#StoreSupports)
+Declare the optional capabilities this store implements, per feature.
+Stores not overriding this support no optional feature; partial
+support is fine (e.g. a subset of query operators).
+The returned object is surfaced to API clients in the `clientData`
+of the store's root stream — it must be JSON-serializable and must
+not contain secrets.
+
+**Kind**: static method of [<code>DataStore</code>](#module_DataStore)  
+**Example**  
+```js
+supports () {
+  return {
+    contentQueries: { // events.get content/clientData conditions
+      fields: ['content', 'clientData'],
+      operators: ['eq', 'in', 'prefix'] // subset of: eq neq in exists gt gte lt lte prefix
+    }
+  };
+}
+```
 <a name="module_defaults"></a>
 
 ## defaults
@@ -386,6 +427,9 @@ Prototype object for per-user events data.
     * [.deleteAttachment(userId, eventId, fileId)](#module_UserEvents.deleteAttachment) ⇒ [<code>Promise.&lt;AttachmentResponseItem&gt;</code>](#AttachmentResponseItem)
     * [.update(userId, eventData)](#module_UserEvents.update) ⇒ <code>Promise.&lt;boolean&gt;</code>
     * [.delete(userId, eventId)](#module_UserEvents.delete) ⇒ <code>Promise.&lt;(Event\|EventDeletionItem)&gt;</code>
+    * [.exportAll(userId)](#module_UserEvents.exportAll) ⇒ <code>Promise.&lt;AsyncIterable.&lt;Event&gt;&gt;</code>
+    * [.importAll(userId, items)](#module_UserEvents.importAll) ⇒ <code>Promise.&lt;void&gt;</code>
+    * [.clearAll(userId)](#module_UserEvents.clearAll) ⇒ <code>Promise.&lt;void&gt;</code>
 
 <a name="module_UserEvents.getOne"></a>
 
@@ -548,6 +592,41 @@ Update the specified event with new data (the given event data replaces the orig
 | userId | [<code>identifier</code>](#identifier) | 
 | eventId | [<code>identifier</code>](#identifier) | 
 
+<a name="module_UserEvents.exportAll"></a>
+
+### UserEvents.exportAll(userId) ⇒ <code>Promise.&lt;AsyncIterable.&lt;Event&gt;&gt;</code>
+Export all events for a user as clean application-level objects (no engine artifacts).
+Includes trashed/deleted events.
+
+**Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  
+
+| Param | Type |
+| --- | --- |
+| userId | [<code>identifier</code>](#identifier) | 
+
+<a name="module_UserEvents.importAll"></a>
+
+### UserEvents.importAll(userId, items) ⇒ <code>Promise.&lt;void&gt;</code>
+Import events for a user from an async iterable of event objects.
+
+**Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  
+
+| Param | Type |
+| --- | --- |
+| userId | [<code>identifier</code>](#identifier) | 
+| items | [<code>AsyncIterable.&lt;Event&gt;</code>](#Event) \| [<code>Array.&lt;Event&gt;</code>](#Event) | 
+
+<a name="module_UserEvents.clearAll"></a>
+
+### UserEvents.clearAll(userId) ⇒ <code>Promise.&lt;void&gt;</code>
+Remove all events for a user (actual delete, not soft delete).
+
+**Kind**: static method of [<code>UserEvents</code>](#module_UserEvents)  
+
+| Param | Type |
+| --- | --- |
+| userId | [<code>identifier</code>](#identifier) | 
+
 <a name="module_UserStreams"></a>
 
 ## UserStreams
@@ -563,6 +642,9 @@ Prototype object for per-user streams data.
     * [.createDeleted(userId, streamData)](#module_UserStreams.createDeleted) ⇒ [<code>Promise.&lt;Stream&gt;</code>](#Stream)
     * [.update(userId, updateData)](#module_UserStreams.update) ⇒ [<code>Promise.&lt;Stream&gt;</code>](#Stream)
     * [.delete(userId, streamId)](#module_UserStreams.delete) ⇒ <code>Promise.&lt;(Stream\|StreamDeletionItem)&gt;</code>
+    * [.exportAll(userId)](#module_UserStreams.exportAll) ⇒ <code>Promise.&lt;AsyncIterable.&lt;Stream&gt;&gt;</code>
+    * [.importAll(userId, items)](#module_UserStreams.importAll) ⇒ <code>Promise.&lt;void&gt;</code>
+    * [.clearAll(userId)](#module_UserStreams.clearAll) ⇒ <code>Promise.&lt;void&gt;</code>
 
 <a name="module_UserStreams.getOne"></a>
 
@@ -678,6 +760,41 @@ Get a list of deleted ids since
 | userId | [<code>identifier</code>](#identifier) | 
 | streamId | [<code>identifier</code>](#identifier) | 
 
+<a name="module_UserStreams.exportAll"></a>
+
+### UserStreams.exportAll(userId) ⇒ <code>Promise.&lt;AsyncIterable.&lt;Stream&gt;&gt;</code>
+Export all streams for a user as clean application-level objects (no engine artifacts).
+Includes trashed/deleted streams.
+
+**Kind**: static method of [<code>UserStreams</code>](#module_UserStreams)  
+
+| Param | Type |
+| --- | --- |
+| userId | [<code>identifier</code>](#identifier) | 
+
+<a name="module_UserStreams.importAll"></a>
+
+### UserStreams.importAll(userId, items) ⇒ <code>Promise.&lt;void&gt;</code>
+Import streams for a user from an async iterable of stream objects.
+
+**Kind**: static method of [<code>UserStreams</code>](#module_UserStreams)  
+
+| Param | Type |
+| --- | --- |
+| userId | [<code>identifier</code>](#identifier) | 
+| items | [<code>AsyncIterable.&lt;Stream&gt;</code>](#Stream) \| [<code>Array.&lt;Stream&gt;</code>](#Stream) | 
+
+<a name="module_UserStreams.clearAll"></a>
+
+### UserStreams.clearAll(userId) ⇒ <code>Promise.&lt;void&gt;</code>
+Remove all streams for a user (actual delete, not soft delete).
+
+**Kind**: static method of [<code>UserStreams</code>](#module_UserStreams)  
+
+| Param | Type |
+| --- | --- |
+| userId | [<code>identifier</code>](#identifier) | 
+
 <a name="ErrorIds"></a>
 
 ## ErrorIds
@@ -736,6 +853,20 @@ Constructor for data store errors.
 A string uniquely identifying an object (user, event, stream, etc.)
 
 **Kind**: global typedef  
+<a name="StoreSupports"></a>
+
+## StoreSupports : <code>Object</code>
+Optional-capability declaration, keyed by feature.
+
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| [contentQueries] | <code>Object</code> | Support for events.get `content`/`clientData` query conditions. |
+| [contentQueries.fields] | <code>Array.&lt;string&gt;</code> | Supported condition fields ('content', 'clientData'). |
+| [contentQueries.operators] | <code>Array.&lt;string&gt;</code> | Supported operators (subset of: eq, neq, in, exists, gt, gte, lt, lte, prefix). |
+
 <a name="timestamp"></a>
 
 ## timestamp : <code>number</code>
@@ -779,6 +910,25 @@ A positive floating-point number representing the number of seconds since a refe
 | userId | [<code>identifier</code>](#identifier) | 
 | key | <code>string</code> | 
 | value | <code>\*</code> | 
+
+<a name="UserStorageInfos"></a>
+
+## UserStorageInfos : <code>object</code>
+All infos are optional, infos can be extended with custom properties
+
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| [totalSizeKb] | <code>number</code> | total storage used in Kb |
+| [streams] | <code>Object</code> |  |
+| [streams.count] | <code>number</code> | number of streams |
+| [streams.sizeKb] | <code>number</code> | size used by stream in Kb |
+| [events.count] | <code>number</code> | number of events |
+| [events.sizeKb] | <code>number</code> | size used by events in Kb |
+| [files.count] | <code>number</code> | number of files |
+| [files.sizeKb] | <code>number</code> | size used by files in Kb |
 
 <a name="KeyValueData"></a>
 
