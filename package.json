@@ -7,6 +7,16 @@
   "author": "Pryv <info@pryv.com> (https://pryv.com)",
   "main": "src/index.js",
   "types": "src/index.d.ts",
+  "files": [
+    "src",
+    "test",
+    "examples",
+    "!examples/*/node_modules",
+    "docs",
+    "DOCUMENTATION.md",
+    "CHANGELOG.md",
+    "old-data-structures.md"
+  ],
   "devDependencies": {
     "@types/express": "^4.17.17",
     "@types/mocha": "^10.0.1",

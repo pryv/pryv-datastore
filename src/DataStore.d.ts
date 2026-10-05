@@ -85,14 +85,14 @@ export type UserStorageInfos = {
         count?: number;
         sizeKb?: number;
     };
-    /**
-     * number of events
-     */
-    count?: number;
-    /**
-     * size used by events in Kb
-     */
-    sizeKb?: number;
+    events?: {
+        count?: number;
+        sizeKb?: number;
+    };
+    files?: {
+        count?: number;
+        sizeKb?: number;
+    };
 };
 export type KeyValueData = {
     /**

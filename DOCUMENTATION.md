@@ -925,8 +925,10 @@ All infos are optional, infos can be extended with custom properties
 | [streams] | <code>Object</code> |  |
 | [streams.count] | <code>number</code> | number of streams |
 | [streams.sizeKb] | <code>number</code> | size used by stream in Kb |
+| [events] | <code>Object</code> |  |
 | [events.count] | <code>number</code> | number of events |
 | [events.sizeKb] | <code>number</code> | size used by events in Kb |
+| [files] | <code>Object</code> |  |
 | [files.count] | <code>number</code> | number of files |
 | [files.sizeKb] | <code>number</code> | size used by files in Kb |
 
