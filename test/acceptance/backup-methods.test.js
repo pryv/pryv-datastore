@@ -155,7 +155,7 @@ describe('Backup/Restore methods', function () {
       const proto = Object.getPrototypeOf(ds.createUserStreams({}));
       for (const method of ['exportAll', 'importAll', 'clearAll']) {
         const desc = Object.getOwnPropertyDescriptor(proto, method);
-        expect(desc.configurable, `${method} should be non-configurable`).to.be.false;
+        expect(desc.configurable, `${method} should be non-configurable`).to.equal(false);
       }
     });
 
@@ -163,7 +163,7 @@ describe('Backup/Restore methods', function () {
       const proto = Object.getPrototypeOf(ds.createUserEvents({}));
       for (const method of ['exportAll', 'importAll', 'clearAll']) {
         const desc = Object.getOwnPropertyDescriptor(proto, method);
-        expect(desc.configurable, `${method} should be non-configurable`).to.be.false;
+        expect(desc.configurable, `${method} should be non-configurable`).to.equal(false);
       }
     });
   });

@@ -3,6 +3,18 @@
  */
 export type identifier = string;
 /**
+ * - Optional-capability declaration, keyed by feature.
+ */
+export type StoreSupports = {
+    /**
+     * - Support for events.get `content`/`clientData` query conditions.
+     */
+    contentQueries?: {
+        fields?: string[];
+        operators?: string[];
+    };
+};
+/**
  * - A positive floating-point number representing the number of seconds since a reference time (Unix epoch time).
  */
 export type timestamp = number;
@@ -24,6 +36,9 @@ export type UserStreams = {
     createDeleted(userId: string, streamData: any): Promise<any>;
     update(userId: string, updateData: any): Promise<any>;
     delete(userId: string, streamId: string): Promise<any>;
+    exportAll(userId: string): Promise<AsyncIterable<any>>;
+    importAll(userId: string, items: any[] | AsyncIterable<any>): Promise<void>;
+    clearAll(userId: string): Promise<void>;
 };
 export type UserEvents = {
     getOne(userId: string, eventId: string): Promise<any>;
@@ -51,10 +66,34 @@ export type UserEvents = {
     deleteAttachment(userId: string, eventId: string, fileId: string): Promise<any>;
     update(userId: string, eventData: any): Promise<boolean>;
     delete(userId: string, eventId: string): Promise<any>;
+    exportAll(userId: string): Promise<AsyncIterable<any>>;
+    importAll(userId: string, items: any[] | AsyncIterable<any>): Promise<void>;
+    clearAll(userId: string): Promise<void>;
 };
 export type FnKeyValueGetAll = (userId: identifier) => object;
 export type FnKeyValueGet = (userId: identifier, key: string) => any;
 export type FnKeyValueSet = (userId: identifier, key: string, value: any) => void;
+/**
+ * - All infos are optional, infos can be extended with custom properties
+ */
+export type UserStorageInfos = {
+    /**
+     * total storage used in Kb
+     */
+    totalSizeKb?: number;
+    streams?: {
+        count?: number;
+        sizeKb?: number;
+    };
+    events?: {
+        count?: number;
+        sizeKb?: number;
+    };
+    files?: {
+        count?: number;
+        sizeKb?: number;
+    };
+};
 export type KeyValueData = {
     /**
      * Get all key-value data for the given user.
@@ -111,27 +150,6 @@ export type Logger = {
     debug: FnLog;
 };
 /**
- * Storage infos All infos are optional, infos can be extended with custom properties
- */
-export type UserStorageInfos = {
-    /**
-     * total storage used in Kb
-     */
-    totalSizeKb?: number;
-    streams?: {
-        count?: number;
-        sizeKb?: number;
-    };
-    events?: {
-        count?: number;
-        sizeKb?: number;
-    };
-    files?: {
-        count?: number;
-        sizeKb?: number;
-    };
-};
-/**
  * Initialize the store.
  * @param {StoreInitializationParams} params
  * @returns {Promise<DataStore>} The data store object itself (for method chaining).
@@ -147,23 +165,26 @@ declare function deleteUser(userId: string): Promise<never>;
 /**
  * Returns information on storage used
  * @param {identifier} userId
+ * @returns {Promise<UserStorageInfos>}
  */
-declare function getUserStorageInfos (userId: string): Promise<UserStorageInfos>;
-/**
- * Optional-capability declaration, keyed by feature.
- */
-declare type StoreSupports = {
-    contentQueries?: {
-        fields?: string[];
-        operators?: string[];
-    };
-};
+declare function getUserStorageInfos(userId: string): Promise<UserStorageInfos>;
 /**
  * Declare the optional capabilities this store implements, per feature.
- * Stores not overriding this support no optional feature; partial support
- * is fine (e.g. a subset of query operators). The returned object is
- * surfaced to API clients in the `clientData` of the store's root stream —
- * it must be JSON-serializable and must not contain secrets.
+ * Stores not overriding this support no optional feature; partial
+ * support is fine (e.g. a subset of query operators).
+ * The returned object is surfaced to API clients in the `clientData`
+ * of the store's root stream — it must be JSON-serializable and must
+ * not contain secrets.
+ * @returns {StoreSupports}
+ * @example
+ * supports () {
+ *   return {
+ *     contentQueries: { // events.get content/clientData conditions
+ *       fields: ['content', 'clientData'],
+ *       operators: ['eq', 'in', 'prefix'] // subset of: eq neq in exists gt gte lt lte prefix
+ *     }
+ *   };
+ * }
  */
 declare function supports(): StoreSupports;
 export {};

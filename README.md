@@ -2,12 +2,7 @@
 
 Library and tools for accessing external data stores within Pryv.io.
 
-**⚠️ This is the first public release; the following are still likely to change:**
-
-- Code examples
-- API documentation
-- (For contributors) Development environment
-
+See [CHANGELOG.md](CHANGELOG.md) for the changes between versions.
 
 ## Quick start
 
@@ -43,8 +38,13 @@ To let Pryv.io access an external data store:
        // remove user from store…
      },
 
-     async getUserStorageSize (userId) {
-       // compute user storage bytes…
+     async getUserStorageInfos (userId) {
+       // report storage used (see UserStorageInfos)…
+     },
+
+     // optional: declare the optional capabilities this store implements
+     supports () {
+       return {};
      }
    })
    ```
@@ -66,16 +66,17 @@ For the details, see the [API documentation](DOCUMENTATION.md).
 
 Notes about `path` on docker implementation we recommend to place your package in the configuration folder.
 - Open-Pryv.io: folder `configs/your-data-store` will be accessible with `/app/configs/your-data-store`
-- Entreprise edition: folder `var-pryv/core/conf/your-data-store` will be accessible with `/app/conf/your-data-store`
+- Enterprise edition: folder `var-pryv/core/conf/your-data-store` will be accessible with `/app/conf/your-data-store`
 
-`npm install` should be run upfront with you package with the very same node version than the one in docker containers.
-- Pryv 1.9.0 => node 18.14.3 
+`npm install` should be run upfront with your package with the very same Node.js version as the one in the docker containers.
+- Pryv 1.9.0 => Node.js 18.14.3
+- Open-Pryv.io 2.x => Node.js 24 (see `engines` in open-pryv.io's `package.json`)
 
 ## Contributing
 
 ### Installation
 
-Prerequisites: [Node.js](https://nodejs.org/en/download/) 16+, [just](https://github.com/casey/just#installation)
+Prerequisites: [Node.js](https://nodejs.org/en/download/) 20.19+ or 22.12+, [just](https://github.com/casey/just#installation)
 
 Run `just` to see the available commands (defined in `justfile`), e.g.
 

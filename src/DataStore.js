@@ -116,8 +116,10 @@ for (const propName of Object.getOwnPropertyNames(DataStore)) {
  * @property {Object} [streams]
  * @property {number} [streams.count] number of streams
  * @property {number} [streams.sizeKb] size used by stream in Kb
+ * @property {Object} [events]
  * @property {number} [events.count] number of events
  * @property {number} [events.sizeKb] size used by events in Kb
+ * @property {Object} [files]
  * @property {number} [files.count] number of files
  * @property {number} [files.sizeKb] size used by files in Kb
  */

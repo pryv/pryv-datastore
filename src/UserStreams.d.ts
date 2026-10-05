@@ -82,7 +82,6 @@ export declare function update(userId: string, updateData: any): Promise<any>;
  * @returns {Promise<Stream|StreamDeletionItem>} - The trashed Stream
  */
 declare function _delete(userId: string, streamId: string): Promise<any>;
-export { _delete as delete };
 /**
  * Export all streams for a user as clean application-level objects (no engine artifacts).
  * Includes trashed/deleted streams.
@@ -96,10 +95,11 @@ export declare function exportAll(userId: string): Promise<AsyncIterable<any>>;
  * @param {AsyncIterable<Stream>|Array<Stream>} items
  * @returns {Promise<void>}
  */
-export declare function importAll(userId: string, items: AsyncIterable<any> | any[]): Promise<void>;
+export declare function importAll(userId: string, items: any[] | AsyncIterable<any>): Promise<void>;
 /**
  * Remove all streams for a user (actual delete, not soft delete).
  * @param {identifier} userId
  * @returns {Promise<void>}
  */
 export declare function clearAll(userId: string): Promise<void>;
+export { _delete as delete };

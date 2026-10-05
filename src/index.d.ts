@@ -28,6 +28,9 @@ export declare function createDataStore(implementation: any): {
         createDeleted(userId: string, streamData: any): Promise<any>;
         update(userId: string, updateData: any): Promise<any>;
         delete(userId: string, streamId: string): Promise<any>;
+        exportAll(userId: string): Promise<AsyncIterable<any>>;
+        importAll(userId: string, items: any[] | AsyncIterable<any>): Promise<void>;
+        clearAll(userId: string): Promise<void>;
     };
     events: {
         getOne(userId: string, eventId: string): Promise<any>;
@@ -55,8 +58,13 @@ export declare function createDataStore(implementation: any): {
         deleteAttachment(userId: string, eventId: string, fileId: string): Promise<any>;
         update(userId: string, eventData: any): Promise<boolean>;
         delete(userId: string, eventId: string): Promise<any>;
+        exportAll(userId: string): Promise<AsyncIterable<any>>;
+        importAll(userId: string, items: any[] | AsyncIterable<any>): Promise<void>;
+        clearAll(userId: string): Promise<void>;
     };
     deleteUser(userId: string): Promise<never>;
+    getUserStorageInfos(userId: string): Promise<DataStore.UserStorageInfos>;
+    supports(): DataStore.StoreSupports;
 };
 /**
  * Create a new user streams object with the given implementation.
@@ -81,6 +89,9 @@ export declare function createUserStreams(implementation: any): {
     createDeleted(userId: string, streamData: any): Promise<any>;
     update(userId: string, updateData: any): Promise<any>;
     delete(userId: string, streamId: string): Promise<any>;
+    exportAll(userId: string): Promise<AsyncIterable<any>>;
+    importAll(userId: string, items: any[] | AsyncIterable<any>): Promise<void>;
+    clearAll(userId: string): Promise<void>;
 };
 /**
  * Create a new user events object with the given implementation.
@@ -113,5 +124,8 @@ export declare function createUserEvents(implementation: any): {
     deleteAttachment(userId: string, eventId: string, fileId: string): Promise<any>;
     update(userId: string, eventData: any): Promise<boolean>;
     delete(userId: string, eventId: string): Promise<any>;
+    exportAll(userId: string): Promise<AsyncIterable<any>>;
+    importAll(userId: string, items: any[] | AsyncIterable<any>): Promise<void>;
+    clearAll(userId: string): Promise<void>;
 };
 export { defaults, errors };
