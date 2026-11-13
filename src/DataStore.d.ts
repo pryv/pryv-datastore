@@ -74,23 +74,26 @@ export type FnKeyValueGetAll = (userId: identifier) => object;
 export type FnKeyValueGet = (userId: identifier, key: string) => any;
 export type FnKeyValueSet = (userId: identifier, key: string, value: any) => void;
 /**
- * - All infos are optional, infos can be extended with custom properties
+ * - All infos are optional, infos can be extended with custom properties. Every `*sizeKb` value is in BYTES despite its name (the name is kept for compatibility).
  */
 export type UserStorageInfos = {
     /**
-     * total storage used in Kb
+     * total storage used, in bytes
      */
     totalSizeKb?: number;
     streams?: {
         count?: number;
+        /** size used by streams, in bytes */
         sizeKb?: number;
     };
     events?: {
         count?: number;
+        /** size used by events, in bytes */
         sizeKb?: number;
     };
     files?: {
         count?: number;
+        /** size used by files, in bytes (Pryv.io reports it as the account's `storageUsed.attachedFiles`) */
         sizeKb?: number;
     };
 };

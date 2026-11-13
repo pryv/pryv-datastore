@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Docs: `UserStorageInfos` sizes (`totalSizeKb`, `streams.sizeKb`, `events.sizeKb`, `files.sizeKb`) are
+  documented as BYTES, which is what Pryv.io stores report and expect. The field names are unchanged
+  (no code or contract change).
+
 ## 1.1.0
 
 All changes are additive: a store written against 1.0.0 keeps working.

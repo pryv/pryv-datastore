@@ -111,17 +111,17 @@ for (const propName of Object.getOwnPropertyNames(DataStore)) {
  */
 
 /**
- * @typedef {object} UserStorageInfos - All infos are optional, infos can be extended with custom properties
- * @property {number} [totalSizeKb] total storage used in Kb
+ * @typedef {object} UserStorageInfos - All infos are optional, infos can be extended with custom properties. Every `*sizeKb` value is in BYTES despite its name (the name is kept for compatibility).
+ * @property {number} [totalSizeKb] total storage used, in bytes
  * @property {Object} [streams]
  * @property {number} [streams.count] number of streams
- * @property {number} [streams.sizeKb] size used by stream in Kb
+ * @property {number} [streams.sizeKb] size used by streams, in bytes
  * @property {Object} [events]
  * @property {number} [events.count] number of events
- * @property {number} [events.sizeKb] size used by events in Kb
+ * @property {number} [events.sizeKb] size used by events, in bytes
  * @property {Object} [files]
  * @property {number} [files.count] number of files
- * @property {number} [files.sizeKb] size used by files in Kb
+ * @property {number} [files.sizeKb] size used by files, in bytes (Pryv.io reports it as the account's `storageUsed.attachedFiles`)
  */
 
 /**

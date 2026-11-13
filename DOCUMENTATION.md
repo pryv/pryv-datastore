@@ -914,23 +914,23 @@ A positive floating-point number representing the number of seconds since a refe
 <a name="UserStorageInfos"></a>
 
 ## UserStorageInfos : <code>object</code>
-All infos are optional, infos can be extended with custom properties
+All infos are optional, infos can be extended with custom properties. Every `*sizeKb` value is in BYTES despite its name (the name is kept for compatibility).
 
 **Kind**: global typedef  
 **Properties**
 
 | Name | Type | Description |
 | --- | --- | --- |
-| [totalSizeKb] | <code>number</code> | total storage used in Kb |
+| [totalSizeKb] | <code>number</code> | total storage used, in bytes |
 | [streams] | <code>Object</code> |  |
 | [streams.count] | <code>number</code> | number of streams |
-| [streams.sizeKb] | <code>number</code> | size used by stream in Kb |
+| [streams.sizeKb] | <code>number</code> | size used by streams, in bytes |
 | [events] | <code>Object</code> |  |
 | [events.count] | <code>number</code> | number of events |
-| [events.sizeKb] | <code>number</code> | size used by events in Kb |
+| [events.sizeKb] | <code>number</code> | size used by events, in bytes |
 | [files] | <code>Object</code> |  |
 | [files.count] | <code>number</code> | number of files |
-| [files.sizeKb] | <code>number</code> | size used by files in Kb |
+| [files.sizeKb] | <code>number</code> | size used by files, in bytes (Pryv.io reports it as the account's `storageUsed.attachedFiles`) |
 
 <a name="KeyValueData"></a>
 
