@@ -70,7 +70,7 @@ All data store implementations inherit from this via <a href="datastore#createDa
 <dt><a href="#FnKeyValueSet">FnKeyValueSet</a> ⇒ <code>void</code></dt>
 <dd></dd>
 <dt><a href="#UserStorageInfos">UserStorageInfos</a> : <code>object</code></dt>
-<dd><p>All infos are optional, infos can be extended with custom properties</p>
+<dd><p>All infos are optional, infos can be extended with custom properties. Every <code>*sizeKb</code> value is in BYTES despite its name (the name is kept for compatibility).</p>
 </dd>
 <dt><a href="#KeyValueData">KeyValueData</a> : <code>object</code></dt>
 <dd></dd>
